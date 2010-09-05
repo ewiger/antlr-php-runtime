@@ -23,16 +23,26 @@ abstract class Token
     const UP = 3;
     const MIN_TOKEN_TYPE = 4; // = UP+1;
     const EOF = CharStream::EOF; // = CharStream.EOF;
+    const INVALID_TOKEN_TYPE = 0;
+
+    private static $eofToken = null;
+    private static $invalidToken = null;
+    private static $skipToken = null;
 
     static public function EOF_TOKEN()
     {
-        return CommonToken::forType(self::EOF);
+        if (self::$eofToken == null) {
+            self::$eofToken = CommonToken::forType(self::EOF);
+        }
+        return self::$eofToken;
     }
-    const INVALID_TOKEN_TYPE = 0;
 
     static public function INVAILD_TOKEN()
     {
-        return CommonToken::forType(self::INVALID_TOKEN_TYPE);
+        if (self::$invalidToken = null) {
+            self::$invalidToken = CommonToken::forType(self::INVALID_TOKEN_TYPE);
+        }
+        return self::$invalidToken;
     }
 
     /**
@@ -41,6 +51,9 @@ abstract class Token
      */
     static public function SKIP_TOKEN()
     {
-        return CommonToken::forType(self::INVALID_TOKEN_TYPE);
+        if (self::$skipToken == null) {
+            self::$skipToken = CommonToken::forType(self::INVALID_TOKEN_TYPE);
+        }
+        return self::$skipToken;
     }
 }
