@@ -1,10 +1,13 @@
 <?php
 
-require_once 'antlr.php';
+namespace Antlr\Tests;
+use Antlr\Runtime\ANTLRStringStream;
+use Antlr\Runtime\CommonTokenStream;
+
 require_once 'generated/t030specialStatesLexer.php';
 require_once 'generated/t030specialStatesParser.php';
 
-class Parser030Test extends PHPUnit_Framework_TestCase
+class Parser030Test extends \PHPUnit_Framework_TestCase
 {
     public function testValid1()
     {
@@ -40,9 +43,9 @@ class Parser030Test extends PHPUnit_Framework_TestCase
     public function createParser($input)
     {
         $ass = new ANTLRStringStream($input);
-        $lexer = new t030specialStatesLexer($ass);
+        $lexer = new \t030specialStatesLexer($ass);
         $ts = new CommonTokenStream($lexer);
-        $parser = new t030specialStatesParser($ts);
+        $parser = new \t030specialStatesParser($ts);
         return $parser;
     }
 }

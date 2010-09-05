@@ -1,32 +1,33 @@
 <?php
 
-require_once 'PHPUnit/Framework.php';
-require_once "antlr.php";
+
+namespace Antlr\Tests;
+use Antlr\Runtime\ANTLRStringStream;
 require_once "generated/t006lexer.php";
 
-class LexerTest0065 extends PHPUnit_Framework_TestCase
+class LexerTest0065 extends \PHPUnit_Framework_TestCase
 {
     public function test1()
     {
         $ass = new ANTLRStringStream('fofaaooa');
-        $lexer = new t006lexer($ass);
+        $lexer = new \t006lexer($ass);
 
         $token = $lexer->nextToken();
-        $this->assertEquals(t006lexer::T_FOO, $token->getType());
+        $this->assertEquals(\t006lexer::T_FOO, $token->getType());
         $this->assertEquals("fo", $token->getText());
 
         $token = $lexer->nextToken();
-        $this->assertEquals(t006lexer::T_FOO, $token->getType());
+        $this->assertEquals(\t006lexer::T_FOO, $token->getType());
         $this->assertEquals("faaooa", $token->getText());
 
         $token = $lexer->nextToken();
-        $this->assertEquals(t006lexer::T_EOF, $token->getType());
+        $this->assertEquals(\t006lexer::T_EOF, $token->getType());
     }
 
     public function testMalformedInput()
     {
         $ass = new ANTLRStringStream('fofoaooaoa2');
-        $lexer = new t006lexer($ass);
+        $lexer = new \t006lexer($ass);
         $token = $lexer->nextToken();
         $token = $lexer->nextToken();
 

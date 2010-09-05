@@ -1,10 +1,14 @@
 <?php
 
-require_once 'antlr.php';
+namespace Antlr\Tests;
+use Antlr\Runtime\ANTLRStringStream;
+use Antlr\Runtime\CommonTokenStream;
+
+
 require_once 'generated/t031emptyAltLexer.php';
 require_once 'generated/t031emptyAltParser.php';
 
-class Parser031Test extends PHPUnit_Framework_TestCase
+class Parser031Test extends \PHPUnit_Framework_TestCase
 {
     public function testValid1()
     {
@@ -20,9 +24,9 @@ class Parser031Test extends PHPUnit_Framework_TestCase
     public function createParser($input)
     {
         $ass = new ANTLRStringStream($input);
-        $lexer = new t031emptyAltLexer($ass);
+        $lexer = new \t031emptyAltLexer($ass);
         $ts = new CommonTokenStream($lexer);
-        $parser = new t031emptyAltParser($ts);
+        $parser = new \t031emptyAltParser($ts);
         return $parser;
     }
 }

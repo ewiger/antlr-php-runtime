@@ -1,10 +1,11 @@
 <?php
 
-require_once 'PHPUnit/Framework.php';
-require_once "antlr.php";
+
+namespace Antlr\Tests;
+use Antlr\Runtime\ANTLRStringStream;
 require_once "generated/t003lexer.php";
 
-class LexerTest003 extends PHPUnit_Framework_TestCase
+class LexerTest003 extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
@@ -15,7 +16,7 @@ class LexerTest003 extends PHPUnit_Framework_TestCase
         $arr = array($one, $zero, $fooze);
 
         $ass = new ANTLRStringStream("10fooze");
-        $lexer = new t003lexer($ass);
+        $lexer = new \t003lexer($ass);
         foreach ($arr as $val) {
             list($tokenType, $tokenVal) = $val;
             $token = $lexer->nextToken();

@@ -29,6 +29,8 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+namespace Antlr\Runtime;
+
 /** The root of the ANTLR exception hierarchy.
  *
  *  To avoid English-only error messages and to generally make things
@@ -59,7 +61,7 @@
  *  Better to just say the recognizer had a problem and then let the parser
  *  figure out a fancy report.
  */
-class RecognitionException extends Exception
+class RecognitionException extends \Exception
 {
 
     public $line = 0;

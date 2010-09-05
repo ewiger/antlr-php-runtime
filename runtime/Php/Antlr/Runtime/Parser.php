@@ -28,11 +28,14 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+namespace Antlr\Runtime;
+
 /** A parser for TokenStreams.  "parser grammars" result in a subclass
  *  of this.
  */
-class AntlrParser extends BaseRecognizer
+class Parser extends BaseRecognizer
 {
+
     /**
      * @var IntStream
      */
@@ -72,7 +75,7 @@ class AntlrParser extends BaseRecognizer
             $current = $this->input->LT(-1);
 
             if (!$current) {
-                throw new Exception("No previous token found!");
+                throw new \Exception("No previous token found!");
             }
         }
         $t->line = $current->getLine();

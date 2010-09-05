@@ -1,20 +1,21 @@
 <?php
 
-require_once 'PHPUnit/Framework.php';
-require_once "antlr.php";
+
+namespace Antlr\Tests;
+use Antlr\Runtime\ANTLRStringStream;
 require_once "generated/t009lexer.php";
 
-class LexerTest009 extends PHPUnit_Framework_TestCase
+class LexerTest009 extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
         $arr = array('0', '8', '5');
 
         $ass = new ANTLRStringStream('085');
-        $lexer = new t009lexer($ass);
+        $lexer = new \t009lexer($ass);
         foreach ($arr as $val) {
             $token = $lexer->nextToken();
-            self::assertEquals(t009lexer::T_DIGIT, $token->getType());
+            self::assertEquals(\t009lexer::T_DIGIT, $token->getType());
             self::assertEquals($val, $token->getText());
         }
     }

@@ -1,11 +1,14 @@
 <?php
 
-require_once 'PHPUnit/Framework.php';
-require_once "antlr.php";
+
+namespace Antlr\Tests;
+use Antlr\Runtime\ANTLRStringStream;
+use Antlr\Runtime\CommonTokenStream;
+
 require_once "generated/t017parserLexer.php";
 require_once "generated/t017parserParser.php";
 
-class t017parserParserExtended extends t017parserParser
+class t017parserParserExtended extends \t017parserParser
 {
 
     public $reportedErrors = array();
@@ -17,7 +20,7 @@ class t017parserParserExtended extends t017parserParser
 
 }
 
-class ParserTest017 extends PHPUnit_Framework_TestCase
+class ParserTest017 extends \PHPUnit_Framework_TestCase
 {
     function testValid()
     {
@@ -48,7 +51,7 @@ class ParserTest017 extends PHPUnit_Framework_TestCase
     function parser($expr)
     {
         $ass = new ANTLRStringStream($expr);
-        $lex = new t017parserLexer($ass);
+        $lex = new \t017parserLexer($ass);
         $cts = new CommonTokenStream($lex);
         $tap = new t017parserParserExtended($cts);
         return $tap;

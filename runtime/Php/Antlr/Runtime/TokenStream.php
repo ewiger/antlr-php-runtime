@@ -28,6 +28,8 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+namespace Antlr\Runtime;
+
 /** A stream of tokens accessing tokens from a TokenSource */
 interface TokenStream extends IntStream
 {

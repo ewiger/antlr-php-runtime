@@ -499,19 +499,19 @@ UnicodeEscape
     :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
     ;
 
-WS  :  (' '|'\r'|'\t'|'\u000C'|'\n') {$channel=HIDDEN;}
+WS  :  (' '|'\r'|'\t'|'\u000C'|'\n') {$channel=self::HIDDEN;}
     ;
 
 COMMENT
-    :   '/*' ( options {greedy=false;} : . )* '*/' {$channel=HIDDEN;}
+    :   '/*' ( options {greedy=false;} : . )* '*/' {$channel=self::HIDDEN;}
     ;
 
 LINE_COMMENT
-    : '//' ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;}
+    : '//' ~('\n'|'\r')* '\r'? '\n' {$channel=self::HIDDEN;}
     ;
 
 // ignore #line info for now
 LINE_COMMAND 
-    : '#' ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;}
+    : '#' ~('\n'|'\r')* '\r'? '\n' {$channel=self::HIDDEN;}
     ;
 

@@ -1,15 +1,16 @@
 <?php
 
-require_once 'PHPUnit/Framework.php';
-require_once "antlr.php";
+
+namespace Antlr\Tests;
+use Antlr\Runtime\ANTLRStringStream;
 require_once "generated/t011lexer.php";
 
-class LexerTest011 extends PHPUnit_Framework_TestCase
+class LexerTest011 extends \PHPUnit_Framework_TestCase
 {
     public function test1()
     {
-        $id = t011lexer::T_IDENTIFIER;
-        $ws = t011lexer::T_WS;
+        $id = \t011lexer::T_IDENTIFIER;
+        $ws = \t011lexer::T_WS;
 
         $lexer = $this->lexer("foob__ar _Ab_98 \n A12_sdf");
 
@@ -34,7 +35,7 @@ class LexerTest011 extends PHPUnit_Framework_TestCase
     function lexer($input)
     {
         $ass = new ANTLRStringStream($input);
-        $lexer = new t011lexer($ass);
+        $lexer = new \t011lexer($ass);
         return $lexer;
     }
 }

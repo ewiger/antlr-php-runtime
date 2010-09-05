@@ -1,9 +1,11 @@
 <?php
 
+namespace Antlr\Runtime;
+
 /**
  * Base class for lexers
  */
-abstract class AntlrLexer extends BaseRecognizer
+abstract class Lexer extends BaseRecognizer
 {
     protected $input;
 
@@ -134,12 +136,12 @@ abstract class AntlrLexer extends BaseRecognizer
     {
         $i = 0;
         while ($i < strlen($s)) {
-            if ($this->input->LA(1) != charAt($s, $i)) {
+            if ($this->input->LA(1) != $this->charAt($s, $i)) {
                 if ($this->state->backtracking > 0) {
                     $this->state->failed = true;
                     return;
                 }
-                $mte = new MismatchedTokenException(charAt($s, $i), $this->input);
+                $mte = new MismatchedTokenException($this->charAt($s, $i), $this->input);
                 $this->recover($mte);
                 throw $mte;
             }
@@ -309,5 +311,8 @@ abstract class AntlrLexer extends BaseRecognizer
         parent::traceOut($ruleName, $ruleIndex, $inputSymbol);
     }
 
+    public function charAt($str, $i){
+        return ord(substr($str, $i, 1));
+    }
 }
 

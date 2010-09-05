@@ -1,9 +1,9 @@
 <?php
 
-require_once 'PHPUnit/Framework.php';
-require_once 'antlr.php';
+namespace Antlr\Tests;
+use Antlr\Runtime\DFA;
 
-class DFATest extends PHPUnit_Framework_TestCase
+class DFATest extends \PHPUnit_Framework_TestCase
 {
     static public function dataUnpackRLE()
     {

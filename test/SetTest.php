@@ -1,9 +1,9 @@
 <?php
 
-require_once 'PHPUnit/Framework.php';
-require_once 'antlr.php';
+namespace Antlr\Tests;
+use Antlr\Runtime\Set;
 
-class SetTest extends PHPUnit_Framework_TestCase
+class SetTest extends \PHPUnit_Framework_TestCase
 {
 
     protected function setUp()

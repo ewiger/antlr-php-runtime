@@ -1,5 +1,7 @@
 <?php
 
+namespace Antlr\Runtime;
+
 class RecognizerSharedState
 {
 

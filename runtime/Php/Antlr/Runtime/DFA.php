@@ -28,6 +28,8 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+namespace Antlr\Runtime;
+
 /** A DFA implemented as a set of transition tables.
  *
  *  Any state that has a semantic predicate edge is special; those states
@@ -67,9 +69,9 @@ class DFA {
     public function predict($input)
     {
         if ($input === null)
-            throw new Exception("input object is a null pointer");
+            throw new \Exception("input object is a null pointer");
         if (!is_object($input))
-            throw new Exception("input is not an object");
+            throw new \Exception("input is not an object");
         if ( $this->debug ) {
             echo "Enter DFA.predict for decision ".$this->decisionNumber."\n";
         }

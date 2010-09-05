@@ -28,6 +28,8 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+namespace Antlr\Runtime;
+
 /** The most common stream of tokens is one where every token is buffered up
  *  and tokens are prefiltered for a certain channel (the parser will only
  *  see these tokens and cannot change the filter channel number during the

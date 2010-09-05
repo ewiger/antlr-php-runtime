@@ -1,5 +1,7 @@
 <?php
 
+namespace Antlr\Runtime;
+
 class CommonToken implements Token
 {
     public $input;

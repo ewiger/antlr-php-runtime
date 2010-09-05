@@ -1,6 +1,6 @@
 <?php
 
-require_once 'CommonToken.php';
+namespace Antlr\Runtime;
 
 class TokenConst
 {
@@ -27,12 +27,6 @@ class TokenConst
      *  by parser.
      */
     public static $HIDDEN_CHANNEL = 99;
-}
-
-interface Token
-{
-    const DEFAULT_CHANNEL = 0;
-    const HIDDEN_CHANNEL = 99;
 }
 
 TokenConst::$DEFAULT_CHANNEL = 0;

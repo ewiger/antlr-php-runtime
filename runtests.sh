@@ -7,4 +7,4 @@ fi
 
 export PROJ_PATH=`pwd`
 
-phpunit --include-path="${PROJ_PATH}:${PROJ_PATH}/runtime/Php/" --verbose ${file}
+phpunit --bootstrap test/bootstrap.php --include-path="${PROJ_PATH}:${PROJ_PATH}/runtime/Php/" --verbose ${file}

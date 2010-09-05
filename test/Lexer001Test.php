@@ -1,22 +1,23 @@
 <?php
 
-require_once 'PHPUnit/Framework.php';
-require_once "antlr.php";
+namespace Antlr\Tests;
+use Antlr\Runtime\ANTLRStringStream;
+
 require_once "generated/t001lexer.php";
 
-class LexerTest001 extends PHPUnit_Framework_TestCase
+class LexerTest001 extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
         $ass = new ANTLRStringStream("0");
-        $lexer = new t001lexer($ass);
+        $lexer = new \t001lexer($ass);
 
         $token = $lexer->nextToken();
-        self::assertEquals(t001lexer::T_ZERO, $token->getType());
+        self::assertEquals(\t001lexer::T_ZERO, $token->getType());
         self::assertEquals('0', $token->getText());
 
         $token = $lexer->nextToken();
-        self::assertEquals(t001lexer::T_EOF, $token->getType());
+        self::assertEquals(\t001lexer::T_EOF, $token->getType());
     }
 
     public function testMalformedInput()
@@ -24,7 +25,7 @@ class LexerTest001 extends PHPUnit_Framework_TestCase
         $this->setExpectedException("Exception", "line 1:0 mismatched character '1' expecting '0'");
 
         $ass = new ANTLRStringStream("1");
-        $lexer = new t001lexer($ass);
+        $lexer = new \t001lexer($ass);
         $token = $lexer->nextToken();
     }
 

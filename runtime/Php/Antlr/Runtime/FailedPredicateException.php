@@ -2,6 +2,7 @@
 /*
  [The "BSD licence"]
  Copyright (c) 2005-2008 Terence Parr
+ Copyright (c) 2009 Yauhen Yakimovich
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -27,18 +28,27 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** Rules can return start/stop info as well as possible trees and templates */
-class RuleReturnScope {
-	/** Return the start token or tree */
-	public function getStart() { return null; }
-	/** Return the stop token or tree */
-	public function getStop() { return null; }
-	/** Has a value potentially if output=AST; */
-	public function getTree() { return null; }
-	/** Has a value potentially if output=template; Don't use StringTemplate
-	 *  type as it then causes a dependency with ST lib.
-	 */
-	public function getTemplate() { return null; }
-}
+namespace Antlr\Runtime;
 
+/** A semantic predicate failed during validation.  Validation of predicates
+ *  occurs when normally parsing the alternative just like matching a token.
+ *  Disambiguating predicate evaluation occurs when we hoist a predicate into
+ *  a prediction decision.
+ */
+class FailedPredicateException extends RecognitionException {
+	public $ruleName;
+	public $predicateText;
+
+	/** Used for remote debugger deserialization */
+	public function __construct(IntStream $input, $ruleName, $predicateText)
+	{
+		parent::__construct($input);
+		$this->ruleName = $ruleName;
+		$this->predicateText = $predicateText;
+	}
+
+	public function __toString() {
+		return "FailedPredicateException(".$this->ruleName.",{".$this->predicateText."}?)";
+	}
+}
 ?>

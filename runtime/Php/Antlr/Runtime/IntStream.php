@@ -28,6 +28,8 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+namespace Antlr\Runtime;
+
 /** A simple stream of integers used when all I care about is the char
  *  or token type sequence (such as interpretation).
  */

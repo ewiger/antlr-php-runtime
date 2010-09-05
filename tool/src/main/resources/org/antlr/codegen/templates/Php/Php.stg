@@ -56,15 +56,33 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 
 <docComment>
 
-# for convenience in actions
-if (!defined('HIDDEN')) define('HIDDEN', BaseRecognizer::$HIDDEN);
+use Antlr\Runtime\IntStream;
+use Antlr\Runtime\DFA;
+use Antlr\Runtime\Parser;
+use Antlr\Runtime\Lexer;
+use Antlr\Runtime\CommonToken;
+use Antlr\Runtime\Set;
+use Antlr\Runtime\Token;
+use Antlr\Runtime\TokenConst;
+use Antlr\Runtime\CharStream;
+use Antlr\Runtime\CharStreamConst;
+use Antlr\Runtime\RecognizerSharedState;
+
+use Antlr\Runtime\EarlyExitException;
+use Antlr\Runtime\FailedPredicateException;
+use Antlr\Runtime\MismatchedRangeException;
+use Antlr\Runtime\MismatchedSetException;
+use Antlr\Runtime\MismatchedTokenException;
+use Antlr\Runtime\NoViableAltException;
+use Antlr\Runtime\RecognitionException;
+use Antlr\Runtime\UnwantedtokenException;
 
 <recognizer>
 ?\>
 >>
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
-      filterMode, superClass="AntlrLexer") ::= <<
+      filterMode, superClass="Lexer") ::= <<
  
 <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>     
 
@@ -260,7 +278,7 @@ for ($i=0; $i \< <numRules>; $i++) {
  {g|$this-><g:delegateName()> = $<g:delegateName()>;}; separator="\n">
 >>
 
-parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType="Object", superClass="AntlrParser", labelType="Token", members={<actions.parser.members>}) ::= <<
+parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType="Object", superClass="Parser", labelType="Token", members={<actions.parser.members>}) ::= <<
 <genericParser(inputStreamType="TokenStream", rewriteElementType="Token", ...)>
 >>
 
@@ -1011,22 +1029,25 @@ function <grammar.recognizerName>_DFA<dfa.decisionNumber>_static(){
     }
     return $arr;
 }
-$<grammar.recognizerName>_DFA<dfa.decisionNumber> = <grammar.recognizerName>_DFA<dfa.decisionNumber>_static();
 
 class <grammar.recognizerName>_DFA<dfa.decisionNumber> extends DFA {
 
+    private static $DFA = null;
+
     public function __construct($recognizer) {
-        global $<grammar.recognizerName>_DFA<dfa.decisionNumber>;
-        $DFA = $<grammar.recognizerName>_DFA<dfa.decisionNumber>;
+        if (self::$DFA === null) {
+            self::$DFA = <grammar.recognizerName>_DFA<dfa.decisionNumber>_static();
+        }
+
         $this->recognizer = $recognizer;
         $this->decisionNumber = <dfa.decisionNumber>;
-        $this->eot = $DFA['eot'];
-        $this->eof = $DFA['eof'];
-        $this->min = $DFA['min'];
-        $this->max = $DFA['max'];
-        $this->accept = $DFA['accept'];
-        $this->special = $DFA['special'];
-        $this->transition = $DFA['transition'];
+        $this->eot = self::$DFA['eot'];
+        $this->eof = self::$DFA['eof'];
+        $this->min = self::$DFA['min'];
+        $this->max = self::$DFA['max'];
+        $this->accept = self::$DFA['accept'];
+        $this->special = self::$DFA['special'];
+        $this->transition = self::$DFA['transition'];
     }
     public function getDescription() {
         return "<dfa.description>";

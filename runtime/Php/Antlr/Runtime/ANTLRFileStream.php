@@ -2,6 +2,7 @@
 /*
  [The "BSD licence"]
  Copyright (c) 2005-2008 Terence Parr
+ Copyright (c) 2009 Yauhen Yakimovich
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -27,14 +28,38 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/**  The recognizer did not match anything for a (..)+ loop. */
-class EarlyExitException extends RecognitionException {
-	public $decisionNumber;
+namespace Antlr\Runtime;
 
-	public function __construct($decisionNumber, $input) {
-		parent::__construct($input);
-		$this->decisionNumber = $decisionNumber;
+/** This is a char buffer stream that is loaded from a file
+ *  all at once when you construct the object.  This looks very
+ *  much like an ANTLReader or ANTLRInputStream, but it's a special case
+ *  since we know the exact size of the object to load.  We can avoid lots
+ *  of data copying. 
+ */
+class ANTLRFileStream extends ANTLRStringStream {
+	protected $fileName;
+
+	public function __construct($fileName, $encoding=null) {
+		$this->fileName = $fileName;
+		$data = $this->load($fileName, $encoding);
+		parent::__construct($data);
+	}
+
+	public function load($fileName, $encoding)
+	{
+		if ( $fileName==null ) {
+			return;
+		}
+		if (!file_exists($fileName)) {
+			throw new \Exception("Can't find file: $fileName");
+		}
+		// TODO: encoding with stream context
+		return file_get_contents($fileName);
+	}
+
+	public function getSourceName() {
+		return $this->fileName;
 	}
 }
-
 ?>
+

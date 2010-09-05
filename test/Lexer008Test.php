@@ -1,20 +1,21 @@
 <?php
 
-require_once 'PHPUnit/Framework.php';
-require_once "antlr.php";
+
+namespace Antlr\Tests;
+use Antlr\Runtime\ANTLRStringStream;
 require_once "generated/t008lexer.php";
 
-class LexerTest008 extends PHPUnit_Framework_TestCase
+class LexerTest008 extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
         $arr = array('f', 'fa', 'f');
 
         $ass = new ANTLRStringStream('ffaf');
-        $lexer = new t008lexer($ass);
+        $lexer = new \t008lexer($ass);
         foreach ($arr as $val) {
             $token = $lexer->nextToken();
-            self::assertEquals(t008lexer::T_FOO, $token->getType());
+            self::assertEquals(\t008lexer::T_FOO, $token->getType());
             self::assertEquals($val, $token->getText());
         }
     }
@@ -22,7 +23,7 @@ class LexerTest008 extends PHPUnit_Framework_TestCase
     public function testMalformedInput()
     {
         $ass = new ANTLRStringStream('fafb');
-        $lexer = new t008lexer($ass);
+        $lexer = new \t008lexer($ass);
         $token = $lexer->nextToken();
         $token = $lexer->nextToken();
 

@@ -1,5 +1,7 @@
 <?php
 
+namespace Antlr\Runtime;
+
 abstract class BaseRecognizer
 {
 
@@ -9,6 +11,8 @@ abstract class BaseRecognizer
 
     // copies from Token object for convenience in actions
     const DEFAULT_TOKEN_CHANNEL = 0;
+    const HIDDEN = Token::HIDDEN_CHANNEL;
+
     public static $HIDDEN; //= TokenConst::$HIDDEN_CHANNEL;
     public static $NEXT_TOKEN_RULE_NAME = "nextToken";
     public $state;
@@ -303,7 +307,7 @@ abstract class BaseRecognizer
     /** Override this method to change where error messages go */
     public function emitErrorMessage($msg)
     {
-        throw new Exception($msg);
+        throw new \Exception($msg);
     }
 
     /** Recover from an error found on the input stream.  This is
@@ -692,7 +696,7 @@ abstract class BaseRecognizer
         if ($recognizerClassName == null) {
             $recognizerClassName = get_class($this);
         }
-        throw new Exception("Not implemented yet");
+        throw new \Exception("Not implemented yet");
         // List rules = new ArrayList();
         // 		StackTraceElement[] stack = e.getStackTrace();
         // 		int i = 0;

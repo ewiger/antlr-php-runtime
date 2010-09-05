@@ -1,10 +1,11 @@
 <?php
 
-require_once 'PHPUnit/Framework.php';
-require_once "antlr.php";
+
+namespace Antlr\Tests;
+use Antlr\Runtime\ANTLRStringStream;
 require_once "generated/t012lexerXMLLexer.php";
 
-class LexerTest012 extends PHPUnit_Framework_TestCase
+class LexerTest012 extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
@@ -13,7 +14,7 @@ class LexerTest012 extends PHPUnit_Framework_TestCase
         $lexer = $this->lexer($input);
         while (true) {
             $token = $lexer->nextToken();
-            if ($token->type == TokenConst::$EOF) {
+            if ($token->type == \Antlr\Runtime\TokenConst::$EOF) {
                 break;
             }
         }
@@ -40,7 +41,7 @@ class LexerTest012 extends PHPUnit_Framework_TestCase
         $this->setExpectedException('Exception');
         while(true) {
             $token = $lexer->nextToken();
-            if ($token->type == TokenConst::$EOF) {
+            if ($token->type == \Antlr\Runtime\TokenConst::$EOF) {
                 break;
             }
         }
@@ -49,7 +50,7 @@ class LexerTest012 extends PHPUnit_Framework_TestCase
     function lexer($input)
     {
         $ass = new ANTLRStringStream($input);
-        $lexer = new t012lexerXMLLexer($ass);
+        $lexer = new \t012lexerXMLLexer($ass);
         return $lexer;
     }
 }
