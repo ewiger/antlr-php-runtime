@@ -1,3 +1,4 @@
+<?php
 /*
  [The "BSD licence"]
  Copyright (c) 2005-2008 Terence Parr
@@ -25,44 +26,46 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.runtime.tree;
+namespace Antlr\Runtime\Tree;
 
-import org.antlr.runtime.RecognizerSharedState;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.TokenStream;
+use Antlr\Runtime\RecognizerSharedState;
+use Antlr\Runtime\RecognitionException;
+use Antlr\Runtime\TokenStream;
 
-public class TreeFilter extends TreeParser {
+class TreeFilter extends TreeParser {
+    /*
     public interface fptr {
-        public void rule() throws RecognitionException;
+        public function rule() throws RecognitionException;
+    }*/
+
+    protected $originalTokenStream;
+    protected $originalAdaptor;
+
+    public function __construct(TreeNodeStream $input, RecognizerSharedState $state = null)
+    {
+        parent::__construct($input, $state);
+        $originalAdaptor = $input->getTreeAdaptor();
+        $originalTokenStream = $input->getTokenStream();
     }
 
-    protected TokenStream originalTokenStream;
-    protected TreeAdaptor originalAdaptor;
+    public function applyOnce($t, $whichRule) {
+        if ( $t==null ) {
+            return;
+        }
 
-    public TreeFilter(TreeNodeStream input) {
-        super(input);
-    }
-    public TreeFilter(TreeNodeStream input, RecognizerSharedState state) {
-        super(input, state);
-        originalAdaptor = input.getTreeAdaptor();
-        originalTokenStream = input.getTokenStream();
-    }
-
-    public void applyOnce(Object t, fptr whichRule) {
-        if ( t==null ) return;
         try {
             // share TreeParser object but not parsing-related state
-            state = new RecognizerSharedState();
-            input = new CommonTreeNodeStream(originalAdaptor, t);
-            ((CommonTreeNodeStream)input).setTokenStream(originalTokenStream);
-            setBacktrackingLevel(1);
-            whichRule.rule();
-            setBacktrackingLevel(0);
+            $state = new RecognizerSharedState();
+            $input = new CommonTreeNodeStream($this->originalAdaptor, $t);
+            $this->input->setTokenStream($this->originalTokenStream);
+            $this->setBacktrackingLevel(1);
+            // @TODO$whichRule.rule();
+            $this->setBacktrackingLevel(0);
         }
-        catch (RecognitionException e) { ; }
+        catch (RecognitionException $e) {  }
     }
 
-    public void downup(Object t) {
+    public function downup(Object t) {
         TreeVisitor v = new TreeVisitor(new CommonTreeAdaptor());
         TreeVisitorAction actions = new TreeVisitorAction() {
             public Object pre(Object t)  { applyOnce(t, topdown_fptr); return t; }
@@ -72,13 +75,13 @@ public class TreeFilter extends TreeParser {
     }
         
     fptr topdown_fptr = new fptr() {
-        public void rule() throws RecognitionException {
+        public function rule() throws RecognitionException {
             topdown();
         }
     };
 
     fptr bottomup_fptr = new fptr() {
-        public void rule() throws RecognitionException {
+        public function rule() throws RecognitionException {
             bottomup();
         }
     };
@@ -86,6 +89,6 @@ public class TreeFilter extends TreeParser {
     // methods the downup strategy uses to do the up and down rules.
     // to override, just define tree grammar rule topdown and turn on
     // filter=true.
-    public void topdown() throws RecognitionException {;}
-    public void bottomup() throws RecognitionException {;}
+    public function topdown() throws RecognitionException {;}
+    public function bottomup() throws RecognitionException {;}
 }

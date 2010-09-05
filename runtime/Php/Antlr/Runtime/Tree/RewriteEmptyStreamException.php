@@ -1,3 +1,4 @@
+<?php
 /*
  [The "BSD licence"]
  Copyright (c) 2005-2008 Terence Parr
@@ -25,11 +26,10 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.runtime.tree;
+namespace Antlr\Runtime\Tree;
 
 /** Ref to ID or expr but no tokens in ID stream or subtrees in expr stream */
-public class RewriteEmptyStreamException extends RewriteCardinalityException {
-	public RewriteEmptyStreamException(String elementDescription) {
-		super(elementDescription);
-	}
+class RewriteEmptyStreamException extends RewriteCardinalityException
+{
+
 }

@@ -1,3 +1,4 @@
+<?php
 /*
  [The "BSD licence"]
  Copyright (c) 2005-2008 Terence Parr
@@ -25,15 +26,13 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.runtime.tree;
+namespace Antlr\Runtime\Tree;
 
-/** No elements within a (...)+ in a rewrite rule */
-public class RewriteEarlyExitException extends RewriteCardinalityException {
-	public RewriteEarlyExitException() {
-		super(null);
-	}
-	public RewriteEarlyExitException(String elementDescription) {
-		super(elementDescription);
-	}
-
+/** Base class for all exceptions thrown during AST rewrite construction.
+ *  This signifies a case where the cardinality of two or more elements
+ *  in a subrule are different: (ID INT)+ where |ID|!=|INT|
+ */
+class RewriteCardinalityException extends Exception
+{
+    
 }
