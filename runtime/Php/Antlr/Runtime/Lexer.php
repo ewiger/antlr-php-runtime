@@ -11,6 +11,10 @@ abstract class Lexer extends BaseRecognizer
 
     public function __construct($input, &$state=null)
     {
+        if (is_string($input)) {
+            $input = new ANTLRStringStream($input);
+        }
+
         if ($state == null) {
             $state = new RecognizerSharedState();
         }

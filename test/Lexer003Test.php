@@ -15,7 +15,7 @@ class LexerTest003 extends \PHPUnit_Framework_TestCase
 
         $arr = array($one, $zero, $fooze);
 
-        $ass = new ANTLRStringStream("10fooze");
+        $ass = ("10fooze");
         $lexer = new \t003lexer($ass);
         foreach ($arr as $val) {
             list($tokenType, $tokenVal) = $val;

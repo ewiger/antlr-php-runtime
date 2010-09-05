@@ -10,7 +10,7 @@ class Lexer040Test extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
-        $ass = new ANTLRStringStream('defined');
+        $ass = ('defined');
         $lexer = new \t040bug80($ass);
 
         while($lexer->nextToken()->getType() != \Antlr\Runtime\Token::EOF) {

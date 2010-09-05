@@ -11,7 +11,7 @@ class Lexer027Test extends \PHPUnit_Framework_TestCase
     {
         $this->markTestSkipped('T_END should be T_EOF, but how?!');
 
-        $ass = new ANTLRStringStream(' ');
+        $ass = (' ');
         $lexer = new \t027eof($ass);
 
         $token = $lexer->nextToken();

@@ -44,7 +44,7 @@ class ParserTest015 extends \PHPUnit_Framework_TestCase
 
     function parser($expr)
     {
-        $ass = new ANTLRStringStream($expr);
+        $ass = ($expr);
         $lex = new \t015calcLexer($ass);
         $cts = new CommonTokenStream($lex);
         $tap = new \t015calcParser($cts);

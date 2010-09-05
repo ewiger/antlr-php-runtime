@@ -33,7 +33,7 @@ namespace Antlr\Runtime;
 /** A parser for TokenStreams.  "parser grammars" result in a subclass
  *  of this.
  */
-class Parser extends BaseRecognizer
+abstract class Parser extends BaseRecognizer
 {
 
     /**

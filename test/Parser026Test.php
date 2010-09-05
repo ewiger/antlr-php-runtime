@@ -60,7 +60,7 @@ class ParserTest026 extends \PHPUnit_Framework_TestCase
 
     function parser($expr)
     {
-        $ass = new ANTLRStringStream($expr);
+        $ass = ($expr);
         $lex = new Lexer($ass);
         $this->lexer = $lex;
         $cts = new CommonTokenStream($lex);

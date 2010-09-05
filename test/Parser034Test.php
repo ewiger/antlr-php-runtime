@@ -11,7 +11,7 @@ class Parser034Test extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
-        $ass = new ANTLRStringStream('   a');
+        $ass = ('   a');
         $lexer = new \t034tokenLabelPropertyRefLexer($ass);
         $s = new CommonTokenStream($lexer);
         $parser = new \t034tokenLabelPropertyRefParser($s);

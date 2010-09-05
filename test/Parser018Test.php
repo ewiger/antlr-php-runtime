@@ -11,7 +11,7 @@ class ParserTest018 extends \PHPUnit_Framework_TestCase
 {
     function parser($expr)
     {
-        $ass = new ANTLRStringStream($expr);
+        $ass = ($expr);
         $lex = new \t018llstarLexer($ass);
         $cts = new CommonTokenStream($lex);
         $tap = new \t018llstarParser($cts);

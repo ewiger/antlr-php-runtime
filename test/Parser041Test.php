@@ -11,7 +11,7 @@ class Parser041Test extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
-        $ass = new ANTLRStringStream('a a a');
+        $ass = ('a a a');
         $lexer = new \t041parametersLexer($ass);
         $s = new CommonTokenStream($lexer);
         $parser = new \t041parametersParser($s);

@@ -42,7 +42,7 @@ class Parser030Test extends \PHPUnit_Framework_TestCase
      */
     public function createParser($input)
     {
-        $ass = new ANTLRStringStream($input);
+        $ass = ($input);
         $lexer = new \t030specialStatesLexer($ass);
         $ts = new CommonTokenStream($lexer);
         $parser = new \t030specialStatesParser($ts);

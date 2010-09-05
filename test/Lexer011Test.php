@@ -34,7 +34,7 @@ class LexerTest011 extends \PHPUnit_Framework_TestCase
 
     function lexer($input)
     {
-        $ass = new ANTLRStringStream($input);
+        $ass = ($input);
         $lexer = new \t011lexer($ass);
         return $lexer;
     }

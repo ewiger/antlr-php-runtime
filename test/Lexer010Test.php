@@ -20,7 +20,7 @@ class LexerTest010 extends \PHPUnit_Framework_TestCase
             array($id, 'A12sdf')
         );
 
-        $ass = new ANTLRStringStream("foobar _Ab98 \n A12sdf");
+        $ass = ("foobar _Ab98 \n A12sdf");
         $lexer = new \t010lexer($ass);
         foreach ($expectedTokens as $val) {
             list($tokenType, $tokenVal) = $val;
@@ -32,7 +32,7 @@ class LexerTest010 extends \PHPUnit_Framework_TestCase
 
     public function testMalformedInput()
     {
-        $ass = new ANTLRStringStream('a-b');
+        $ass = ('a-b');
         $lexer = new \t010lexer($ass);
         $token = $lexer->nextToken();
 

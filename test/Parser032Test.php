@@ -10,7 +10,7 @@ class Lexer032Test extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
-        $ass = new ANTLRStringStream('BEGIN A END');
+        $ass = ('BEGIN A END');
         $lexer = new \t032subrulePredictLexer($ass);
         $s = new CommonTokenStream($lexer);
         $parser = new \t032subrulePredictParser($s);

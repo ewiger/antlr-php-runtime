@@ -11,7 +11,7 @@ class LexerTest004 extends \PHPUnit_Framework_TestCase
     {
         $arr = array('f', 'fo', 'foo', 'fooo');
 
-        $ass = new ANTLRStringStream('ffofoofooo');
+        $ass = ('ffofoofooo');
         $lexer = new \t004lexer($ass);
 
         $token = $lexer->nextToken();

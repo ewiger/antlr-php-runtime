@@ -9,7 +9,7 @@ class LexerTest0065 extends \PHPUnit_Framework_TestCase
 {
     public function test1()
     {
-        $ass = new ANTLRStringStream('fofaaooa');
+        $ass = ('fofaaooa');
         $lexer = new \t006lexer($ass);
 
         $token = $lexer->nextToken();
@@ -26,7 +26,7 @@ class LexerTest0065 extends \PHPUnit_Framework_TestCase
 
     public function testMalformedInput()
     {
-        $ass = new ANTLRStringStream('fofoaooaoa2');
+        $ass = ('fofoaooaoa2');
         $lexer = new \t006lexer($ass);
         $token = $lexer->nextToken();
         $token = $lexer->nextToken();

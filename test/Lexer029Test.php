@@ -9,7 +9,7 @@ class Lexer029Test extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
-        $ass = new ANTLRStringStream('ac');
+        $ass = ('ac');
         $lexer = new \t029synpredgate($ass);
         $lexer->nextToken();
     }

@@ -12,7 +12,7 @@ class LexerTest007 extends \PHPUnit_Framework_TestCase
 
         $arr = array('fo', 'fababbooabb');
 
-        $ass = new ANTLRStringStream('fofababbooabb');
+        $ass = ('fofababbooabb');
         $lexer = new \t007lexer($ass);
         foreach ($arr as $val) {
             $token = $lexer->nextToken();
@@ -23,7 +23,7 @@ class LexerTest007 extends \PHPUnit_Framework_TestCase
 
     public function testMalformedInput()
     {
-        $ass = new ANTLRStringStream('foaboao');
+        $ass = ('foaboao');
         $lexer = new \t007lexer($ass);
 
         $this->setExpectedException('Exception', "line 1:6 required (...)+ loop did not match anything at character 'o'");

@@ -11,7 +11,7 @@ class Parser039Test extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
-        $ass = new ANTLRStringStream('a, b, c, 1, 2 A FOOBAR GNU1 A BLARZ');
+        $ass = ('a, b, c, 1, 2 A FOOBAR GNU1 A BLARZ');
         $lexer = new \t039labelsLexer($ass);
         $s = new CommonTokenStream($lexer);
         $parser = new \t039labelsParser($s);

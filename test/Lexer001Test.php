@@ -9,7 +9,7 @@ class LexerTest001 extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
-        $ass = new ANTLRStringStream("0");
+        $ass = ("0");
         $lexer = new \t001lexer($ass);
 
         $token = $lexer->nextToken();
@@ -24,7 +24,7 @@ class LexerTest001 extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException("Exception", "line 1:0 mismatched character '1' expecting '0'");
 
-        $ass = new ANTLRStringStream("1");
+        $ass = ("1");
         $lexer = new \t001lexer($ass);
         $token = $lexer->nextToken();
     }

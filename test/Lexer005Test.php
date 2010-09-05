@@ -9,7 +9,7 @@ class LexerTest005 extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
-        $ass = new ANTLRStringStream('fofofoofooo');
+        $ass = ('fofofoofooo');
         $lexer = new \t005lexer($ass);
 
         $token = $lexer->nextToken();
@@ -44,7 +44,7 @@ class LexerTest005 extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Exception', "line 1:1 required (...)+ loop did not match anything at character 'f'");
 
-        $ass = new ANTLRStringStream('ffo');
+        $ass = ('ffo');
         $lexer = new \t005lexer($ass);
         $token = $lexer->nextToken();
     }

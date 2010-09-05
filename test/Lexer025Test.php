@@ -28,7 +28,7 @@ class LexerTest025 extends \PHPUnit_Framework_TestCase
 
     function lexer($input)
     {
-        $ass = new ANTLRStringStream($input);
+        $ass = ($input);
         $lexer = new \t025lexerRulePropertyRef($ass);
         return $lexer;
     }

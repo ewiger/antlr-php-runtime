@@ -11,7 +11,7 @@ class Parser037Test extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
-        $ass = new ANTLRStringStream('   a a a a  ');
+        $ass = ('   a a a a  ');
         $lexer = new \t037rulePropertyRefLexer($ass);
         $s = new CommonTokenStream($lexer);
         $parser = new \t037rulePropertyRefParser($s);

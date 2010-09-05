@@ -10,7 +10,7 @@ class Lexer038Test extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {
-        $ass = new ANTLRStringStream('a  2');
+        $ass = ('a  2');
         $lexer = new \t038lexerRuleLabel($ass);
 
         while (true) {

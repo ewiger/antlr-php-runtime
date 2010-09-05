@@ -13,7 +13,7 @@ class Parser035Test extends \PHPUnit_Framework_TestCase
     {
         $this->markTestSkipped('Problem in generated parser, code should be $t = $this->b(); but is only $this->b();');
 
-        $ass = new ANTLRStringStream('   a a a a  ');
+        $ass = ('   a a a a  ');
         $lexer = new \t035ruleLabelPropertyRefLexer($ass);
         $s = new CommonTokenStream($lexer);
         $parser = new \t035ruleLabelPropertyRefParser($s);
