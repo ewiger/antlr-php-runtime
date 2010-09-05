@@ -31,8 +31,8 @@ IDENTIFIER
         {
             # a comment
           \$this->capture('action;');
-            \$this->capture(implode(" ", array($text, $type, $line, $pos, $index, $channel, $start, $stop)));
-            if(true) \$this->capture(\$this->foobar);
+          \$this->capture(implode(" ", array($text, $type, $line, $pos, $index, $channel, $start, $stop)));
+          if(true) \$this->capture(\$this->foobar);
         }
     ;
 

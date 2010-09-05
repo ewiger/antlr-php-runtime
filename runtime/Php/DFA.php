@@ -64,7 +64,8 @@ class DFA {
     //Possibly rewrite  predict. There is one more place i might need to fix, where i thought
     //try{}catch(ex){[work]; throw ex}; [work]; would be the same as a try finally;
 
-    public function predict($input) {
+    public function predict($input)
+    {
         if ($input === null)
             throw new Exception("input object is a null pointer");
         if (!is_object($input))
@@ -75,8 +76,7 @@ class DFA {
         $mark = $input->mark(); // remember where decision started in input
         try {
             $ret = $this->_predict($input);
-        }
-        catch(Exception $e) {
+        } catch(Exception $e) {
             $input->rewind($mark);
             throw $e;
         }
@@ -190,16 +190,20 @@ class DFA {
      *  static short[] which generates so much init code that the class won't
      *  compile. :(
      */
-    public static function unpackRLE($encodedArray, $unsigned=false) {
-		$data = array();
-        for ($i=0,$len=sizeof($encodedArray); $i<$len; $i+=2) {
-            $n = $encodedArray[$i];
-            // limit number of transitions, or parsing time >3 sec?!
-            if($n>500) continue;
-            $v = $encodedArray[$i+1];
-			$intValue = $unsigned||(($v&0x8000)==0)?$v:-(0x10000 - $v);
-            for ($j=1; $j<=$n; $j++) {
-                $data[] = $intValue;
+    public static function unpackRLE($encoded)
+    {
+        $len  = strlen($encoded);
+        $data = array();
+        for ($i=0; $i<$len; $i+=2) {
+            $n = ord($encoded[$i]);
+            $v = ord($encoded[$i+1]);
+
+            if ($v == 255) {
+                $v = -1;
+            }
+
+            for ($j=1; $j<=$n; ++$j) {
+                $data[] = $v;
             }
         }
         return $data;
@@ -211,6 +215,40 @@ class DFA {
      **/
     function getToken($name) {
         return $this->recognizer->getToken($name);
+    }
+
+    // DFAs are anonyomeous inner classes in Java, or overwrite self in Python.
+    // Using magic methods is about the only thing we can do to simulate this behaviour
+    // without having to move the DFAs into the Parser somehow (which would probably be
+    // a hack itself, or ugly, or impossible)
+
+    /**
+     *
+     * @param <type> $name
+     */
+    public function __get($name)
+    {
+        $this->recognizer->$name;
+    }
+
+    public function __set($name, $value)
+    {
+        $this->recognizer->$name = $value;
+    }
+
+    public function __isset($name)
+    {
+        return isset($this->recognizer->$name);
+    }
+
+    public function __unset($name)
+    {
+        return isset($this->recognizer->$name);
+    }
+
+    public function __call($method, $args)
+    {
+        return call_user_func_array(array($this->recognizer, $method), $args);
     }
 }
 

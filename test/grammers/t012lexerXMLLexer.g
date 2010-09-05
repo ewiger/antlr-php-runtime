@@ -122,12 +122,11 @@ fragment LETTER
 	;
 
 fragment WS  :
-        (   ' '
-        |   '\t'
-        |  ( '\n'
-            |	'\r\n'
-            |	'\r'
-            )
+        ( ' '
+        | '\t'
+        | '\n'
+        | '\r'
+            
         )+
     ;    
 

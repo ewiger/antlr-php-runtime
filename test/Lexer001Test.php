@@ -2,29 +2,30 @@
 
 require_once 'PHPUnit/Framework.php';
 require_once "antlr.php";
-require_once "t001lexer.php";
-class LexerTest001 extends PHPUnit_Framework_TestCase{
-	protected function setUp(){
-	}
-	
-	protected function tearDown(){
-	}
-	
-	public function test1(){
-		$ass = new ANTLRStringStream("0");
-		$lexer = new t001lexer($ass);
-		$token = $lexer->nextToken();
-		self::assertEquals(4, $token->getType());
-		self::assertEquals('0', $token->getText());
-	}
-	
-	public function test2(){
-		$ass = new ANTLRStringStream("10");
-		$lexer = new t001lexer($ass);
-		$token = $lexer->nextToken();
-		self::assertEquals(4, $token->getType());
-		self::assertEquals('0', $token->getText());		
-	}
-}
+require_once "generated/t001lexer.php";
 
-?>
+class LexerTest001 extends PHPUnit_Framework_TestCase
+{
+    public function testValid()
+    {
+        $ass = new ANTLRStringStream("0");
+        $lexer = new t001lexer($ass);
+
+        $token = $lexer->nextToken();
+        self::assertEquals(t001lexer::T_ZERO, $token->getType());
+        self::assertEquals('0', $token->getText());
+
+        $token = $lexer->nextToken();
+        self::assertEquals(t001lexer::T_EOF, $token->getType());
+    }
+
+    public function testMalformedInput()
+    {
+        $this->setExpectedException("Exception", "line 1:0 mismatched character '1' expecting '0'");
+
+        $ass = new ANTLRStringStream("1");
+        $lexer = new t001lexer($ass);
+        $token = $lexer->nextToken();
+    }
+
+}

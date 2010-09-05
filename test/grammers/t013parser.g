@@ -9,6 +9,9 @@ options {
 }
 
 @parser::members {
+public $reportedErrors = array();
+public $identifiers = array();
+
 function foundIdentifier(\$name){
     \$this->identifiers[] = \$name;
 }
@@ -19,7 +22,7 @@ function emitErrorMessage(\$msg){
 
 }
 
-document:.
+document:
         t=IDENTIFIER {\$this->foundIdentifier($t.text);}
         ;
 

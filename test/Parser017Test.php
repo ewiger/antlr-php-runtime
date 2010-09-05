@@ -2,63 +2,55 @@
 
 require_once 'PHPUnit/Framework.php';
 require_once "antlr.php";
-require_once "t017parserLexer.php";
-require_once "t017parserParser.php";
+require_once "generated/t017parserLexer.php";
+require_once "generated/t017parserParser.php";
 
-class parser extends t017parserParser{
-	public $reportedErrors = array();
+class t017parserParserExtended extends t017parserParser
+{
 
+    public $reportedErrors = array();
 
-	function emitErrorMessage($msg){
-		$this->reportedErrors[] = $msg;
-	}
+    function emitErrorMessage($msg)
+    {
+        $this->reportedErrors[] = $msg;
+    }
+
 }
 
-class ParserTest017 extends PHPUnit_Framework_TestCase{
-	protected function setUp(){
-	}
-	
-	protected function tearDown(){
-	}
-	
-	function testValid(){
-		$parser = $this->parser("int foo;");
-		$parser->program();
-		self::assertTrue(sizeof($parser->reportedErrors) == 0);
-	}
+class ParserTest017 extends PHPUnit_Framework_TestCase
+{
+    function testValid()
+    {
+        $parser = $this->parser("int foo;");
+        $parser->program();
+        self::assertEquals(array(), $parser->reportedErrors);
+    }
 
-    function testMalformedInput1(){
-		$parser = $this->parser('int foo() { 1+2 }');
-    	$parser->program();
-			
-		# FIXME: currently strings with formatted errors are collected
-		# can't check error locations yet
-		self::assertTrue(sizeof($parser->reportedErrors) == 1);
-	}
-
-    function testMalformedInput2(){
-		$parser = $this->parser('int foo() { 1+; 1+2 }');
+    function testMalformedInput1()
+    {
+        $parser = $this->parser('int foo() { 1+2 }');
         $parser->program();
 
-		# FIXME: currently strings with formatted errors are collected
-		# can't check error locations yet
-        self::assertTrue(sizeof($parser->reportedErrors) == 2);
-	}
+        self::assertEquals(array("line 1:16 missing ';' at '}'"), $parser->reportedErrors);
+    }
 
-	function parser($expr){
-		$ass = new ANTLRStringStream($expr);
-		$lex = new t017parserLexer($ass);
-		$cts = new CommonTokenStream($lex);
-		$tap = new parser($cts);
-		return $tap;
-	}
-	
-	function readFile($filename){
-		$handle = fopen($filename, "r");
-		$contents = fread($handle, filesize($filename));
-		fclose($handle);
-		return $contents;
-	}
+    function testMalformedInput2()
+    {
+        $parser = $this->parser('int foo() { 1+; 1+2 }');
+        $parser->program();
+
+        self::assertEquals(array(
+            "line 1:14 no viable alternative at input ';'",
+            "line 1:20 missing ';' at '}'"
+            ), $parser->reportedErrors);
+    }
+
+    function parser($expr)
+    {
+        $ass = new ANTLRStringStream($expr);
+        $lex = new t017parserLexer($ass);
+        $cts = new CommonTokenStream($lex);
+        $tap = new t017parserParserExtended($cts);
+        return $tap;
+    }
 }
-
-?>

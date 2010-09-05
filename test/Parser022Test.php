@@ -2,50 +2,52 @@
 
 require_once 'PHPUnit/Framework.php';
 require_once "antlr.php";
-require_once "t022scopesLexer.php";
-require_once "t022scopesParser.php";
-class ParserTest022 extends PHPUnit_Framework_TestCase{
-	protected function setUp(){
-	}
-	
-	protected function tearDown(){
-	}
-    
+require_once "generated/t022scopesLexer.php";
+require_once "generated/t022scopesParser.php";
 
-	function testa1(){
-		$parser = $this->parser('foobar');
-		$parser->a();
-	}
+class ParserTest022 extends PHPUnit_Framework_TestCase
+{
+    function testa1()
+    {
+        $parser = $this->parser('foobar');
+        $parser->a();
+    }
 
-	function testb1(){
-		$parser = $this->parser('foobar');
+    function testb1()
+    {
+        $parser = $this->parser('foobar');
 
-		try{
-			$parser->b(false);
-			self::fail();
-		}catch (Exception $re){}
-	}
-	
-	function testb2(){
-		$parser = $this->parser('foobar');
-		$parser->b(true);
-	}
+        try {
+            $parser->b(false);
+            self::fail();
+        } catch (Exception $re) {
+            
+        }
+    }
 
-	function testc1(){
-		$parser = $this->parser('
+    function testb2()
+    {
+        $parser = $this->parser('foobar');
+        $parser->b(true);
+    }
+
+    function testc1()
+    {
+        $parser = $this->parser('
             {
                 int i;
                 int j;
                 i = 0;
             }
             ');
-		$symbols = $parser->c();
+        $symbols = $parser->c();
 
-		self::assertEquals($symbols, array('i', 'j'));
-	}
+        self::assertEquals($symbols, array('i', 'j'));
+    }
 
-	function testc2(){
-		$parser = $this->parser('
+    function testc2()
+    {
+        $parser = $this->parser('
             {
                 int i;
                 int j;
@@ -54,16 +56,17 @@ class ParserTest022 extends PHPUnit_Framework_TestCase{
             }
             ');
 
-		try{
-			$parser->c();
-			self.fail();
-		}catch(Exception $exc){
-			self::assertEquals($exc->getMessage(), 'x');
-		}
-	}
-	
-	function testd1(){
-		$parser = $this->parser('
+        try {
+            $parser->c();
+            self . fail();
+        } catch (Exception $exc) {
+            self::assertEquals($exc->getMessage(), 'x');
+        }
+    }
+
+    function testd1()
+    {
+        $parser = $this->parser('
             {
                 int i;
                 int j;
@@ -75,51 +78,45 @@ class ParserTest022 extends PHPUnit_Framework_TestCase{
                 }
             }
             ');
-		$symbols = $parser->d();
+        $symbols = $parser->d();
 
-		self::assertEquals($symbols, array('i', 'j'));
-	}
-	
-    function teste1(){
-		$parser = $this->parser('
+        self::assertEquals($symbols, array('i', 'j'));
+    }
+
+    function teste1()
+    {
+        $parser = $this->parser('
             { { { { 12 } } } }
             ');
-		$res = $parser->e();
+        $res = $parser->e();
 
-		self::assertEquals($res, 12);
-	}
+        self::assertEquals($res, 12);
+    }
 
-	function testf1(){
-		$parser = $this->parser('
+    function testf1()
+    {
+        $parser = $this->parser('
             { { { { 12 } } } }
             ');
 
-		$res = $parser->f();
-		self::assertEquals($res, null);
-	}
-	
-    function testf2(){
-		$parser = $this->parser('{ { 12 } }');
-		$res = $parser->f();
+        $res = $parser->f();
+        self::assertEquals($res, null);
+    }
 
-		self::assertEquals($res, null);
-	}
+    function testf2()
+    {
+        $parser = $this->parser('{ { 12 } }');
+        $res = $parser->f();
 
+        self::assertEquals($res, null);
+    }
 
-	function parser($expr){
-		$ass = new ANTLRStringStream($expr);
-		$lex = new t022scopesLexer($ass);
-		$cts = new CommonTokenStream($lex);
-		$tap = new t022scopesParser($cts);
-		return $tap;
-	}
-	
-	function readFile($filename){
-		$handle = fopen($filename, "r");
-		$contents = fread($handle, filesize($filename));
-		fclose($handle);
-		return $contents;
-	}
+    function parser($expr)
+    {
+        $ass = new ANTLRStringStream($expr);
+        $lex = new t022scopesLexer($ass);
+        $cts = new CommonTokenStream($lex);
+        $tap = new t022scopesParser($cts);
+        return $tap;
+    }
 }
-
-?>

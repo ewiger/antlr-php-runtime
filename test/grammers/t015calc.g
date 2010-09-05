@@ -9,6 +9,8 @@ options {
 }
 
 @parser::members {
+public $reportedErrors = array();
+
 function emitErrorMessage(\$msg){
     \$this->reportedErrors[] = \$msg;
 }

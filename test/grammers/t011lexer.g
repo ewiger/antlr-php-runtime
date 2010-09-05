@@ -3,6 +3,10 @@ options {
   language = Php;
 }
 
+@lexer::members {
+    public $wsCounter = 0;
+}
+
 IDENTIFIER: 
         ('a'..'z'|'A'..'Z'|'_') 
         ('a'..'z'
@@ -10,8 +14,7 @@ IDENTIFIER:
         |'0'..'9'
         |'_'
             { 
-				global \$ctr;
-				\$ctr++;
+\$this->wsCounter++;
             }
         )*
     ;

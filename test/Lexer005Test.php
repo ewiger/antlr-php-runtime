@@ -2,27 +2,49 @@
 
 require_once 'PHPUnit/Framework.php';
 require_once "antlr.php";
-require_once "t005lexer.php";
-class LexerTest005 extends PHPUnit_Framework_TestCase{
-	protected function setUp(){
-	}
-	
-	protected function tearDown(){
-	}
-	
-	public function test1(){
-		
-		$arr = array('fo', 'foo', 'fooo');
-		
-		$ass = new ANTLRStringStream('ffofoofooo');
-		$lexer = new t005lexer($ass);
-		foreach($arr as $val){
-			$token = $lexer->nextToken();
-			self::assertEquals(4, $token->getType());
-			self::assertEquals($val, $token->getText());
-		}
-		
-	}
-}
+require_once "generated/t005lexer.php";
 
-?>
+class LexerTest005 extends PHPUnit_Framework_TestCase
+{
+    public function testValid()
+    {
+        $ass = new ANTLRStringStream('fofofoofooo');
+        $lexer = new t005lexer($ass);
+
+        $token = $lexer->nextToken();
+        $this->assertEquals(t005lexer::T_FOO, $token->getType());
+        $this->assertEquals('fo', $token->getText());
+        $this->assertEquals(0, $token->getStartIndex());
+        $this->assertEquals(1, $token->getStopIndex());
+
+        $token = $lexer->nextToken();
+        $this->assertEquals(t005lexer::T_FOO, $token->getType());
+        $this->assertEquals('fo', $token->getText());
+        $this->assertEquals(2, $token->getStartIndex());
+        $this->assertEquals(3, $token->getStopIndex());
+
+        $token = $lexer->nextToken();
+        $this->assertEquals(t005lexer::T_FOO, $token->getType());
+        $this->assertEquals('foo', $token->getText());
+        $this->assertEquals(4, $token->getStartIndex());
+        $this->assertEquals(6, $token->getStopIndex());
+
+        $token = $lexer->nextToken();
+        $this->assertEquals(t005lexer::T_FOO, $token->getType());
+        $this->assertEquals('fooo', $token->getText());
+        $this->assertEquals(7, $token->getStartIndex());
+        $this->assertEquals(10, $token->getStopIndex());
+
+        $token = $lexer->nextToken();
+        $this->assertEquals(t005lexer::T_EOF, $token->getType());
+    }
+
+    public function testMalformedInput()
+    {
+        $this->setExpectedException('Exception', "line 1:1 required (...)+ loop did not match anything at character 'f'");
+
+        $ass = new ANTLRStringStream('ffo');
+        $lexer = new t005lexer($ass);
+        $token = $lexer->nextToken();
+    }
+}

@@ -1,3 +1,7 @@
+- Lexer001Test in Python suite shows Lexer as Iterator. Implement that in PHP
+- Refactor out expected tokens (type + text) iteration in the test into an assertion
+- Refactor `Set` to arrays
+- Refactor `State` into BaseRecognition Class (like in Python)
 
 - Implement trivial examples to test Lexer and Parser, then switch to AST 
 generation, and then to full sync with ANTLRv3

@@ -79,12 +79,12 @@ d1
 d2
     : ID '=' NUM ';'
         {
-			for(\$i=sizeof($d)-1;\$i>=0;\$i++){
+			for(\$i=count(\$this->$d)-1;\$i>=0;\$i++){
 				if(in_array($ID.text, $d[$i]::symbols)){
 					break;
 				}
 			}
-			if(\$i==sizeof($d)){
+			if(\$i==count(\$this->$d)){
 				throw new Exception($ID.text);
 			}
         }

@@ -69,7 +69,7 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
 <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>     
 
 class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
-    <tokens:{static $<it.name>=<it.type>;}; separator="\n">
+    <tokens:{const T_<it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <actions.lexer.members>
 
@@ -118,52 +118,59 @@ class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
  *  at backtracking==1.
  */
 filteringNextToken() ::= <<
-public Token nextToken() {
+public function nextToken() {
     while (true) {
-        if ( input.LA(1)==CharStream.EOF ) {
-            return Token.EOF_TOKEN;
+        if ( $this->input->LA(1)==CharStreamConst::$EOF ) {
+            return TokenConst::$EOF_TOKEN;
         }
-        state.token = null;
-	state.channel = Token.DEFAULT_CHANNEL;
-        state.tokenStartCharIndex = input.index();
-        state.tokenStartCharPositionInLine = input.getCharPositionInLine();
-        state.tokenStartLine = input.getLine();
-	state.text = null;
+        $this->state->token = null;
+        $this->state->channel = Token::DEFAULT_CHANNEL;
+        $this->state->tokenStartCharIndex = $this->input->index();
+        $this->state->tokenStartCharPositionInLine = $this->input->getCharPositionInLine();
+        $this->state->tokenStartLine = $this->input->getLine();
+        $this->state->text = null;
         try {
-            int m = input.mark();
-            state.backtracking=1; <! means we won't throw slow exception !>
-            state.failed=false;
-            mTokens();
-            state.backtracking=0;
+            $m = $this->input->mark();
+            $this->state->backtracking = 1; <! means we won't throw slow exception !>
+            $this->state->failed = false;
+            $this->mTokens();
+            $this->state->backtracking=0;
             <! mTokens backtracks with synpred at backtracking==2
                and we set the synpredgate to allow actions at level 1. !>
-            if ( state.failed ) {
-                input.rewind(m);
-                input.consume(); <! advance one char and try again !>
+            if ( $this->state->failed ) {
+                $this->input->rewind($m);
+                $this->input->consume(); <! advance one char and try again !>
             }
             else {
-                emit();
-                return state.token;
+                $this->emit();
+                return $this->state->token;
             }
         }
-        catch (RecognitionException re) {
+        catch (RecognitionException $e) {
             // shouldn't happen in backtracking mode, but...
-            reportError(re);
-            recover(re);
+            $this->reportError($re);
+            // match() routine has already called recover()
         }
     }
 }
 
-public void memoize(IntStream input,
-		int ruleIndex,
-		int ruleStartIndex)
+public function memoize($input, $ruleIndex, $ruleStartIndex)
 {
-if ( state.backtracking>1 ) super.memoize(input, ruleIndex, ruleStartIndex);
+    if ( $this->state->backtracking > 1 ) {
+        parent::memoize($input, $ruleIndex, $ruleStartIndex);
+    }
 }
 
-public boolean alreadyParsedRule(IntStream input, int ruleIndex) {
-if ( state.backtracking>1 ) return super.alreadyParsedRule(input, ruleIndex);
-return false;
+/**
+ * @param IntStream $input
+ * @param int $ruleIndex
+ * @return bool
+ */
+public function alreadyParsedRule($input, $ruleIndex) {
+    if ( $this->state->backtracking>1 ) {
+        return parent::alreadyParsedRule($input, $ruleIndex);
+    }
+    return false;
 }
 >>
 
@@ -263,8 +270,7 @@ parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTL
 treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, 
            numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", 
            superClass="TreeParser", 
-           members={<actions.treeparser.members>},
-           filterMode) ::= <<
+           members={<actions.treeparser.members>}) ::= <<
 <genericParser(inputStreamType="TreeNodeStream", rewriteElementType="Node", ...)>
 >>
 
@@ -341,7 +347,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
 <returnScope(scope=ruleDescriptor.returnScope)>
 
 // $ANTLR start "<ruleName>"
-// <fileName>:<description> 
+// <fileName>
 public function <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>){
     <if(trace)>traceIn("<ruleName>", <ruleDescriptor.index>);<endif>
     <ruleScopeSetUp()>
@@ -413,13 +419,13 @@ $<ruleDescriptor.name>_StartIndex = $this->input->index();
 >>
 
 ruleScopeSetUp() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack.push(new <it>_scope());}; separator="\n">
-<ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
+<ruleDescriptor.useScopes:{array_push($this-><it>_stack, $this-><it>_scope);}; separator="\n">
+<ruleDescriptor.ruleScope:{array_push($this-><it.name>_stack, $this-><it.name>_scope);}; separator="\n">
 >>
 
 ruleScopeCleanUp() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
-<ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
+<ruleDescriptor.useScopes:{array_pop($this-><it>_stack);}; separator="\n">
+<ruleDescriptor.ruleScope:{array_pop($this-><it.name>_stack);}; separator="\n">
 >>
 
 ruleLabelDefs() ::= <<
@@ -491,8 +497,8 @@ function m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>){
         <ruleDescriptor.actions.init>
         <block><\n>
 <else>
-        $_type = <grammar.recognizerName>::$<ruleName>;
-        $_channel = <grammar.recognizerName>::$DEFAULT_TOKEN_CHANNEL;
+        $_type = <grammar.recognizerName>::T_<ruleName>;
+        $_channel = <grammar.recognizerName>::DEFAULT_TOKEN_CHANNEL;
         <ruleMemoization(name=ruleName)>
         <lexerRuleLabelDefs()>
         <ruleDescriptor.actions.init>
@@ -529,7 +535,7 @@ function mTokens(){
 
 /** A (...) subrule with multiple alternatives */
 block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
-// <fileName>:<description> 
+// <fileName>
 $alt<decisionNumber>=<maxAlt>;
 <decls>
 <@predecision()>
@@ -544,7 +550,7 @@ switch ($alt<decisionNumber>) {
 
 /** A rule block with multiple alternatives */
 ruleBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
-// <fileName>:<description> 
+// <fileName>
 $alt<decisionNumber>=<maxAlt>;
 <decls>
 <@predecision()>
@@ -556,7 +562,7 @@ switch ($alt<decisionNumber>) {
 >>
 
 ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
-// <fileName>:<description> 
+// <fileName>
 <decls>
 <@prealt()>
 <alts>
@@ -565,7 +571,7 @@ ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNu
 
 /** A special case of a (...) subrule with a single alternative */
 blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
-// <fileName>:<description> 
+// <fileName>
 <decls>
 <@prealt()>
 <alts>
@@ -574,7 +580,7 @@ blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber
 
 /** A (..)+ block with 1 or more alternatives */
 positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
-// <fileName>:<description> 
+// <fileName>
 $cnt<decisionNumber>=0;
 <decls>
 <@preloop()>
@@ -603,7 +609,7 @@ positiveClosureBlockSingleAlt ::= positiveClosureBlock
 
 /** A (..)* block with 1 or more alternatives */
 closureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
-// <fileName>:<description> 
+// <fileName>
 <decls>
 <@preloop()>
 //loop<decisionNumber>:
@@ -643,7 +649,7 @@ case <i> :
 
 /** An alternative is just a list of elements; at outermost level */
 alt(elements,altNum,description,autoAST,outerAlt,treeLevel,rew) ::= <<
-// <fileName>:<description> 
+// <fileName>
 {
 <@declarations()>
 <elements:element()>
@@ -740,9 +746,10 @@ matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 /** Match a string literal */
 lexerStringRef(string,label) ::= <<
 <if(label)>
-int <label>Start = getCharIndex();
-match(<string>); <checkRuleBacktrackFailure()>
-<labelType> <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start<elementIndex>, getCharIndex()-1);
+$start = getCharIndex();
+$this->match(<string>);
+<checkRuleBacktrackFailure()>
+$<label> = new CommonToken($input, TokenConst::$EOF, Token::DEFAULT_CHANNEL, $start<elementIndex>, $this->getCharIndex()-1);
 <else>
 $this->matchString(<string>); <checkRuleBacktrackFailure()><\n>
 <endif>
@@ -750,7 +757,7 @@ $this->matchString(<string>); <checkRuleBacktrackFailure()><\n>
 
 wildcard(label,elementIndex) ::= <<
 <if(label)>
-<label>=(<labelType>)input.LT(1);<\n>
+<label>=$this->input->LT(1);<\n>
 <endif>
 $this->matchAny($this->input); <checkRuleBacktrackFailure()>
 >>
@@ -802,7 +809,7 @@ lexerRuleRef(rule,label,args,elementIndex,scope) ::= <<
 <if(label)>
 $<label>Start<elementIndex> = $this->getCharIndex();
 $this-><if(scope)><scope:delegateName()>-><endif>m<rule.name>(<args; separator=", ">); <checkRuleBacktrackFailure()>
-$<label> = new CommonToken($this->input, TokenConst::$INVALID_TOKEN_TYPE, TokenConst::$DEFAULT_CHANNEL, $<label>Start<elementIndex>, $this->getCharIndex()-1);
+$<label> = new CommonToken($this->input, TokenConst::$INVALID_TOKEN_TYPE, Token::DEFAULT_CHANNEL, $<label>Start<elementIndex>, $this->getCharIndex()-1);
 <else>
 $this-><if(scope)><scope:delegateName()>-><endif>m<rule.name>(<args; separator=", ">); <checkRuleBacktrackFailure()>
 <endif>
@@ -818,10 +825,10 @@ lexerRuleRefAndListLabel(rule,label,args,elementIndex,scope) ::= <<
 lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
 int <label>Start<elementIndex> = getCharIndex();
-match(EOF); <checkRuleBacktrackFailure()>
-<labelType> <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start<elementIndex>, getCharIndex()-1);
+$this->match(self::T_EOF); <checkRuleBacktrackFailure()>
+<labelType> <label> = new CommonToken(input, EOF, Token::DEFAULT_CHANNEL, <label>Start<elementIndex>, getCharIndex()-1);
 <else>
-match(EOF); <checkRuleBacktrackFailure()>
+$this->match(self::T_EOF); <checkRuleBacktrackFailure()>
 <endif>
 >>
 
@@ -978,13 +985,15 @@ $alt<decisionNumber> = $this->dfa<decisionNumber>->predict($this->input);
  */
 cyclicDFA(dfa) ::= <<
 function <grammar.recognizerName>_DFA<dfa.decisionNumber>_static(){
-    $eot = array(<dfa.javaCompressedEOT; separator=", ", wrap="\n    ">);
-    $eof = array(<dfa.javaCompressedEOF; separator=", ", wrap="\n    ">);
-    $min = array(<dfa.javaCompressedMin; separator=", ", wrap="\n    ">);
-    $max = array(<dfa.javaCompressedMax; separator=", ", wrap="\n    ">);
-    $accept = array(<dfa.javaCompressedAccept; separator=", ", wrap="\n    ">);
-    $special = array(<dfa.javaCompressedSpecial; separator=", ", wrap="\n    ">);
-    $transitionS = array(<dfa.javaCompressedTransition:{s|array(<s; separator=", ", wrap="\n    ">)}; separator=", ", wrap="\n    ">);
+    $eot = "<dfa.javaCompressedEOT; wrap="\" .\n    \"">";
+    $eof = "<dfa.javaCompressedEOF; wrap="\" .\n    \"">";
+    $min = "<dfa.javaCompressedMin; wrap="\" .\n    \"">";
+    $max = "<dfa.javaCompressedMax; wrap="\" .\n    \"">";
+    $accept = "<dfa.javaCompressedAccept; wrap="\" .\n    \"">";
+    $special = "<dfa.javaCompressedSpecial; wrap="\" .\n    \"">";
+    $transitionS = array(
+        <dfa.javaCompressedTransition:{s|"<s; wrap="\" .\n\"">"}; separator=",\n">
+    );
 
     $arr = array();
     $arr['eot'] = DFA::unpackRLE($eot);
@@ -1116,19 +1125,19 @@ setTest(ranges) ::= "<ranges; separator=\"||\">"
 
 globalAttributeScope(scope) ::= <<
 <if(scope.attributes)>
-protected static class <scope.name>_scope {
-    <scope.attributes:{<it.decl>;}; separator="\n">
-}
-protected Stack <scope.name>_stack = new Stack();<\n>
+protected $<scope.name>_scope = array(
+    <scope.attributes:{"<it.decl>" => "",}; separator="\n">
+);
+protected $<scope.name>_stack = array();<\n>
 <endif>
 >>
 
 ruleAttributeScope(scope) ::= <<
 <if(scope.attributes)>
-protected static class <scope.name>_scope {
-    <scope.attributes:{<it.decl>;}; separator="\n">
-}
-protected Stack <scope.name>_stack = new Stack();<\n>
+protected $<scope.name>_scope = array(
+    <scope.attributes:{"<it.decl>" => "",}; separator="\n">
+);
+protected $<scope.name>_stack = array();<\n>
 <endif>
 >>
 
@@ -1201,24 +1210,24 @@ parameterSetAttributeRef(attr,expr) ::= "<attr.name> =<expr>;"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 <if(negIndex)>
-((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>
+$this-><scope>_stack[count($this-><scope>_stack)-<negIndex>-1]['<attr.name>']
 <else>
 <if(index)>
-((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>
+$this-><scope>_stack[<index>]['<attr.name>']
 <else>
-((<scope>_scope)<scope>_stack.peek()).<attr.name>
+$this-><scope>_stack[count($this-><scope>_stack)-1]['<attr.name>']
 <endif>
 <endif>
 >>
 
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
 <if(negIndex)>
-((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name> =<expr>;
+$this-><scope>_stack[count($this-><scope>_stack)-<negIndex>-1]['<attr.name>'] = <expr>;
 <else>
 <if(index)>
-((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name> =<expr>;
+$this-><scope>_stack[<index>]['<attr.name>'] = <expr>;
 <else>
-((<scope>_scope)<scope>_stack.peek()).<attr.name> =<expr>;
+$this-><scope>_stack[count($this-><scope>_stack)-1]['<attr.name>'] = <expr>;
 <endif>
 <endif>
 >>
@@ -1306,9 +1315,9 @@ lexerRuleLabelPropertyRef_int(scope,attr) ::=
     "($<scope>!=null?Integer.valueOf($<scope>.getText()):0)"
 
 // Somebody may ref $template or $tree or $stop within a rule:
-rulePropertyRef_start(scope,attr) ::= "((<labelType>)$retval->start)"
-rulePropertyRef_stop(scope,attr) ::= "((<labelType>)$retval->stop)"
-rulePropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)$retval->tree)"
+rulePropertyRef_start(scope,attr) ::= "($retval->start)"
+rulePropertyRef_stop(scope,attr) ::= "($retval->stop)"
+rulePropertyRef_tree(scope,attr) ::= "($retval->tree)"
 rulePropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
 input.getTokenStream().toString(
@@ -1320,27 +1329,33 @@ $this->input->toStringBetweenTokens($retval->start,$this->input->LT(-1))
 >>
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
-lexerRulePropertyRef_text(scope,attr) ::= "getText()"
-lexerRulePropertyRef_type(scope,attr) ::= "_type"
-lexerRulePropertyRef_line(scope,attr) ::= "state.tokenStartLine"
-lexerRulePropertyRef_pos(scope,attr) ::= "state.tokenStartCharPositionInLine"
+lexerRulePropertyRef_text(scope,attr) ::= "$this->getText()"
+lexerRulePropertyRef_type(scope,attr) ::= "$_type"
+lexerRulePropertyRef_line(scope,attr) ::= "$this->state->tokenStartLine"
+lexerRulePropertyRef_pos(scope,attr) ::= "$this->state->tokenStartCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
 lexerRulePropertyRef_channel(scope,attr) ::= "$_channel"
-lexerRulePropertyRef_start(scope,attr) ::= "state.tokenStartCharIndex"
-lexerRulePropertyRef_stop(scope,attr) ::= "(getCharIndex()-1)"
-lexerRulePropertyRef_int(scope,attr) ::= "Integer.valueOf(<scope>.getText())"
+lexerRulePropertyRef_start(scope,attr) ::= "$this->state->tokenStartCharIndex"
+lexerRulePropertyRef_stop(scope,attr) ::= "($this->getCharIndex()-1)"
+lexerRulePropertyRef_int(scope,attr) ::= "((int)<scope>->getText())"
 
 // setting $st and $tree is allowed in local rule. everything else
 // is flagged as error
-ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.tree =<expr>;"
-ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st =<expr>;"
+ruleSetPropertyRef_tree(scope,attr,expr) ::= "$retval->tree =<expr>;"
+ruleSetPropertyRef_st(scope,attr,expr) ::= "$retval->st =<expr>;"
 
 /** How to execute an action (only when not backtracking) */
 execAction(action) ::= <<
 <if(backtracking)>
+<if(actions.(actionScope).synpredgate)>
 if ( <actions.(actionScope).synpredgate> ) {
   <action>
 }
+<else>
+if ($this->state->backtracking == 0) {
+  <action>
+}
+<endif>
 <else>
   <action>
 <endif>
