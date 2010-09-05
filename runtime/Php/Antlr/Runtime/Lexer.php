@@ -29,8 +29,8 @@ abstract class Lexer extends BaseRecognizer
             return; // no shared state work to do
         }
         $this->state->token = null;
-        $this->state->type = TokenConst::$INVALID_TOKEN_TYPE;
-        $this->state->channel = TokenConst::$DEFAULT_CHANNEL;
+        $this->state->type = Token::INVALID_TOKEN_TYPE;
+        $this->state->channel = Token::DEFAULT_CHANNEL;
         $this->state->tokenStartCharIndex = -1;
         $this->state->tokenStartCharPositionInLine = -1;
         $this->state->tokenStartLine = -1;
@@ -51,14 +51,14 @@ abstract class Lexer extends BaseRecognizer
             $this->state->tokenStartCharPositionInLine = $this->input->getCharPositionInLine();
             $this->state->tokenStartLine = $this->input->getLine();
             $this->state->text = null;
-            if ($this->input->LA(1) == CharStreamConst::$EOF) {
-                return TokenConst::$EOF_TOKEN;
+            if ($this->input->LA(1) == CharStream::EOF) {
+                return Token::EOF_TOKEN();
             }
             try {
                 $this->mTokens();
                 if ($this->state->token == null) {
                     $this->emit();
-                } else if ($this->state->token == Token::$SKIP_TOKEN) {
+                } else if ($this->state->token == Token::SKIP_TOKEN()) {
                     continue;
                 }
                 return $this->state->token;
@@ -80,7 +80,7 @@ abstract class Lexer extends BaseRecognizer
      */
     public function skip()
     {
-        $this->state->token = TokenConst::$SKIP_TOKEN;
+        $this->state->token = Token::SKIP_TOKEN();
     }
 
     /** This is the lexer entry point that sets instance var 'token' */
@@ -283,7 +283,7 @@ abstract class Lexer extends BaseRecognizer
                 $s = "\\r";
                 break;
         }
-        if ($c == TokenConst::$EOF) {
+        if ($c == Token::EOF) {
             $s = "<EOF>";
         }
         return "'" . $s . "'";

@@ -51,4 +51,4 @@ DECIMAL: DIGIT+ '.' DIGIT+;
 fragment
 DIGIT: '0'..'9';
 
-WS: (' ' | '\n' | '\t')+ {$channel = TokenConst::\$HIDDEN_CHANNEL;};
+WS: (' ' | '\n' | '\t')+ {$channel = Token::HIDDEN_CHANNEL;};

@@ -47,7 +47,7 @@ class UnwantedTokenException extends MismatchedTokenException
     public function __toString()
     {
         $exp = ", expected " . $this->expecting;
-        if ($this->expecting == TokenConst::$INVALID_TOKEN_TYPE) {
+        if ($this->expecting == Token::INVALID_TOKEN_TYPE) {
             $exp = "";
         }
         if ($this->token == null) {

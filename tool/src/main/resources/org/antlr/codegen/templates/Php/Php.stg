@@ -63,9 +63,7 @@ use Antlr\Runtime\Lexer;
 use Antlr\Runtime\CommonToken;
 use Antlr\Runtime\Set;
 use Antlr\Runtime\Token;
-use Antlr\Runtime\TokenConst;
 use Antlr\Runtime\CharStream;
-use Antlr\Runtime\CharStreamConst;
 use Antlr\Runtime\RecognizerSharedState;
 use Antlr\Runtime\ParserRuleReturnScope;
 
@@ -139,8 +137,8 @@ class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
 filteringNextToken() ::= <<
 public function nextToken() {
     while (true) {
-        if ( $this->input->LA(1)==CharStreamConst::$EOF ) {
-            return TokenConst::$EOF_TOKEN;
+        if ( $this->input->LA(1) == CharStream::EOF ) {
+            return Token::EOF_TOKEN();
         }
         $this->state->token = null;
         $this->state->channel = Token::DEFAULT_CHANNEL;
@@ -766,7 +764,7 @@ lexerStringRef(string,label) ::= <<
 $start = $this->getCharIndex();
 $this->matchString(<string>);
 <checkRuleBacktrackFailure()>
-$<label> = new CommonToken($this->input, TokenConst::$INVALID_TOKEN_TYPE, Token::DEFAULT_CHANNEL, $start, $this->getCharIndex()-1);
+$<label> = new CommonToken($this->input, Token::INVALID_TOKEN_TYPE, Token::DEFAULT_CHANNEL, $start, $this->getCharIndex()-1);
 <else>
 $this->matchString(<string>); <checkRuleBacktrackFailure()><\n>
 <endif>
@@ -826,7 +824,7 @@ lexerRuleRef(rule,label,args,elementIndex,scope) ::= <<
 <if(label)>
 $<label>Start<elementIndex> = $this->getCharIndex();
 $this-><if(scope)><scope:delegateName()>-><endif>m<rule.name>(<args; separator=", ">); <checkRuleBacktrackFailure()>
-$<label> = new CommonToken($this->input, TokenConst::$INVALID_TOKEN_TYPE, Token::DEFAULT_CHANNEL, $<label>Start<elementIndex>, $this->getCharIndex()-1);
+$<label> = new CommonToken($this->input, Token::INVALID_TOKEN_TYPE, Token::DEFAULT_CHANNEL, $<label>Start<elementIndex>, $this->getCharIndex()-1);
 <else>
 $this-><if(scope)><scope:delegateName()>-><endif>m<rule.name>(<args; separator=", ">); <checkRuleBacktrackFailure()>
 <endif>

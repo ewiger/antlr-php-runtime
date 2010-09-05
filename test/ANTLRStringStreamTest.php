@@ -2,7 +2,7 @@
 
 namespace Antlr\Tests;
 use Antlr\Runtime\ANTLRStringStream,
-    Antlr\Runtime\CharStreamConst;
+    Antlr\Runtime\CharStream;
 
 class ANTLRStringStreamTest extends \PHPUnit_Framework_TestCase
 {
@@ -15,7 +15,7 @@ class ANTLRStringStreamTest extends \PHPUnit_Framework_TestCase
         $ass->consume();
         self::assertEquals('e', chr($ass->LA(1)));
         self::assertEquals('H', chr($ass->LA(-1)));
-        self::assertEquals(CharStreamConst::$EOF, $ass->LA(-2));
+        self::assertEquals(CharStream::EOF, $ass->LA(-2));
         self::assertEquals('ell', $ass->substring(1, 3));
         self::assertEquals(1, $ass->getLine());
         self::assertEquals(1, $ass->getCharPositionInLine());

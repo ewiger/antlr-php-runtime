@@ -144,7 +144,7 @@ class DFA {
                 $input->consume();
                 continue;
             }
-            if ( $c==TokenConst::$EOF && $this->eof[$s]>=0 ) {  // EOF Transition to accept state?
+            if ( $c==Token::EOF && $this->eof[$s]>=0 ) {  // EOF Transition to accept state?
                 if ( $this->debug ) echo "accept via EOF; predict ".$this->accept[$this->eof[$s]]." from ".$this->eof[$s]."\n";
                 return $this->accept[$this->eof[$s]];
             }

@@ -30,11 +30,10 @@
 
 namespace Antlr\Runtime;
 
-$CharStream_EOF = -1;
-
 /** A source of characters for an ANTLR lexer */
 interface CharStream extends IntStream
 {
+    const EOF = -1;
 
     /** For infinite streams, you don't need this; primarily I'm providing
      *  a useful interface for action code.  Just make sure actions don't

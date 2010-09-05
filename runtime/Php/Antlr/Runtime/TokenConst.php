@@ -32,7 +32,7 @@ class TokenConst
 TokenConst::$DEFAULT_CHANNEL = 0;
 TokenConst::$INVALID_TOKEN_TYPE = 0;
 
-TokenConst::$EOF = CharStreamConst::$EOF;
+TokenConst::$EOF = CharStream::EOF;
 TokenConst::$EOF_TOKEN = CommonToken::forType(TokenConst::$EOF);
 
 TokenConst::$INVALID_TOKEN_TYPE = 0;

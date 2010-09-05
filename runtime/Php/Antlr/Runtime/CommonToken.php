@@ -2,7 +2,7 @@
 
 namespace Antlr\Runtime;
 
-class CommonToken implements Token
+class CommonToken extends Token
 {
     public $input;
     public $charPositionInLine;
@@ -25,7 +25,7 @@ class CommonToken implements Token
         if (is_int($channel)) {
             $this->channel = $channel;
         } else if (is_string($channel)) {
-            $this->channel = TokenConst::$DEFAULT_CHANNEL;
+            $this->channel = Token::DEFAULT_CHANNEL;
             $this->text = $channel;
         }
 

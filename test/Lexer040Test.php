@@ -13,7 +13,7 @@ class Lexer040Test extends \PHPUnit_Framework_TestCase
         $ass = new ANTLRStringStream('defined');
         $lexer = new \t040bug80($ass);
 
-        while($lexer->nextToken()->getType() != \Antlr\Runtime\TokenConst::$EOF) {
+        while($lexer->nextToken()->getType() != \Antlr\Runtime\Token::EOF) {
             
         }
     }

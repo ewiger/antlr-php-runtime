@@ -13,7 +13,7 @@ abstract class BaseRecognizer
     const DEFAULT_TOKEN_CHANNEL = 0;
     const HIDDEN = Token::HIDDEN_CHANNEL;
 
-    public static $HIDDEN; //= TokenConst::$HIDDEN_CHANNEL;
+    public static $HIDDEN = self::HIDDEN; // @TODO REMOVE
     public static $NEXT_TOKEN_RULE_NAME = "nextToken";
     public $state;
 
@@ -97,11 +97,11 @@ abstract class BaseRecognizer
             return $false;
         }
         // compute what can follow this grammar element reference
-        if ($follow->member(TokenConst::$EOR_TOKEN_TYPE)) {
+        if ($follow->member(Token::EOR_TOKEN_TYPE)) {
             $viableTokensFollowingThisRule = $this->computeContextSensitiveRuleFOLLOW();
             $follow = $follow->union($viableTokensFollowingThisRule);
             if ($this->state->_fsp >= 0) { // remove EOR if we're not the start symbol
-                $follow->remove(TokenConst::$EOR_TOKEN_TYPE);
+                $follow->remove(Token::EOR_TOKEN_TYPE);
             }
         }
         // if current token is consistent with what could come after set
@@ -112,7 +112,7 @@ abstract class BaseRecognizer
         // BitSet cannot handle negative numbers like -1 (EOF) so I leave EOR
         // in follow set to indicate that the fall of the start symbol is
         // in the set (EOF can follow).
-        if ($follow->member($input->LA(1)) || $follow->member(TokenConst::$EOR_TOKEN_TYPE)) {
+        if ($follow->member($input->LA(1)) || $follow->member(Token::EOR_TOKEN_TYPE)) {
             //System.out.println("LT(1)=="+((TokenStream)input).LT(1)+" is consistent with what follows; inserting...");
             return true;
         }
@@ -199,7 +199,7 @@ abstract class BaseRecognizer
         if ($e instanceof UnwantedTokenException) {
             $ute = $e;
             $tokenName = "<unknown>";
-            if ($ute->expecting == TokenConst::$EOF) {
+            if ($ute->expecting == Token::EOF) {
                 $tokenName = "EOF";
             } else {
                 $tokenName = $tokenNames[$ute->expecting];
@@ -209,7 +209,7 @@ abstract class BaseRecognizer
         } else if ($e instanceof MissingTokenException) {
             $mte = $e;
             $tokenName = "<unknown>";
-            if ($mte->expecting == TokenConst::$EOF) {
+            if ($mte->expecting == Token::EOF) {
                 $tokenName = "EOF";
             } else {
                 $tokenName = $tokenNames[$mte->expecting];
@@ -218,7 +218,7 @@ abstract class BaseRecognizer
         } else if ($e instanceof MismatchedTokenException) {
             $mte = $e;
             $tokenName = "<unknown>";
-            if ($mte->expecting == TokenConst::$EOF) {
+            if ($mte->expecting == Token::EOF) {
                 $tokenName = "EOF";
             } else {
                 $tokenName = $tokenNames[$mte->expecting];
@@ -228,7 +228,7 @@ abstract class BaseRecognizer
         } else if ($e instanceof MismatchedTreeNodeException) {
             $mtne = $e;
             $tokenName = "<unknown>";
-            if ($mtne->expecting == TokenConst::$EOF) {
+            if ($mtne->expecting == Token::EOF) {
                 $tokenName = "EOF";
             } else {
                 $tokenName = $tokenNames[$mtne->expecting];
@@ -292,7 +292,7 @@ abstract class BaseRecognizer
     {
         $s = $t->getText();
         if ($s === null) {
-            if ($t->getType() == TokenConst::$EOF) {
+            if ($t->getType() == Token::EOF) {
                 $s = "<EOF>";
             } else {
                 $s = "<" . $t->getType() . ">";
@@ -512,11 +512,11 @@ abstract class BaseRecognizer
             $followSet->unionInPlace($localFollowSet);
             if ($exact) {
                 // can we see end of rule?
-                if ($localFollowSet->member(TokenConst::$EOR_TOKEN_TYPE)) {
+                if ($localFollowSet->member(Token::EOR_TOKEN_TYPE)) {
                     // Only leave EOR in set if at top (start rule); this lets
                     // us know if have to include follow(start rule); i.e., EOF
                     if ($i > 0) {
-                        $followSet->remove(TokenConst::$EOR_TOKEN_TYPE);
+                        $followSet->remove(Token::EOR_TOKEN_TYPE);
                     }
                 } else { // can't see end of rule, quit
                     break;
@@ -595,7 +595,7 @@ abstract class BaseRecognizer
             // System.out.println("missing token");
             reportError($e);
             // we don't know how to conjure up a token for sets yet
-            return $this->getMissingSymbol($input, $e, TokenConst::$INVALID_TOKEN_TYPE, $follow);
+            return $this->getMissingSymbol($input, $e, Token::INVALID_TOKEN_TYPE, $follow);
         }
         // TODO do single token deletion like above for Token mismatch
         throw $e;
@@ -643,7 +643,7 @@ abstract class BaseRecognizer
     {
         //System.out.println("consumeUntil "+tokenType);
         $ttype = $input->LA(1);
-        while ($ttype != TokenConst::$EOF && $ttype != $tokenType) {
+        while ($ttype != Token::EOF && $ttype != $tokenType) {
             $input->consume();
             $ttype = $input->LA(1);
         }
@@ -654,7 +654,7 @@ abstract class BaseRecognizer
     {
         //System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
         $ttype = $input->LA(1);
-        while ($ttype != TokenConst::$EOF && !$set->member($ttype)) {
+        while ($ttype != Token::EOF && !$set->member($ttype)) {
             //System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
             $input->consume();
             $ttype = $input->LA(1);

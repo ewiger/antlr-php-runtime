@@ -2,8 +2,6 @@
 
 namespace Antlr\Runtime;
 
-CharStreamConst::$EOF = -1;
-
 class ANTLRStringStream implements CharStream
 {
 
@@ -73,13 +71,13 @@ class ANTLRStringStream implements CharStream
         if ($i < 0) {
             $i++; // e.g., translate LA(-1) to use offset i=0; then data[p+0-1]
             if (($this->p + $i - 1) < 0) {
-                return CharStreamConst::$EOF; // invalid; no char before first char
+                return CharStream::EOF; // invalid; no char before first char
             }
         }
 
         if (($this->p + $i - 1) >= $this->n) {
             //System.out.println("char LA("+i+")=EOF; p="+p);
-            return CharStreamConst::$EOF;
+            return CharStream::EOF;
         }
         //System.out.println("char LA("+i+")="+(char)data[p+i-1]+"; p="+p);
         //System.out.println("LA("+i+"); p="+p+" n="+n+" data.length="+data.length);

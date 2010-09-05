@@ -89,7 +89,7 @@ class CommonTokenStream implements TokenStream
     {
         $index = 0;
         $t = $this->tokenSource->nextToken();
-        while ($t != null && $t->getType() != CharStreamConst::$EOF) {
+        while ($t != null && $t->getType() != CharStream::EOF) {
             $discard = false;
             // is there a channel override for token type?
             if ($this->channelOverrideMap != null) {
@@ -253,7 +253,7 @@ class CommonTokenStream implements TokenStream
         }
         //System.out.print("LT(p="+p+","+k+")=");
         if (($this->p + $k - 1) >= count($this->tokens)) {
-            return TokenConst::$EOF_TOKEN;
+            return Token::EOF_TOKEN();
         }
         //System.out.println(tokens.get(p+k-1));
         $i = $this->p;
@@ -265,7 +265,7 @@ class CommonTokenStream implements TokenStream
             $n++;
         }
         if ($i >= count($this->tokens)) {
-            return TokenConst::$EOF_TOKEN;
+            return Token::EOF_TOKEN();
         }
         return $this->tokens[$i];
     }

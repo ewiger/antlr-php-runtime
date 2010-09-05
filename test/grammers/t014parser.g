@@ -36,4 +36,4 @@ call:
     ;
 
 IDENTIFIER: ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*;
-WS:  (' '|'\r'|'\t'|'\n') {$channel=TokenConst::\$HIDDEN_CHANNEL;};
+WS:  (' '|'\r'|'\t'|'\n') {$channel=Token::HIDDEN_CHANNEL;};

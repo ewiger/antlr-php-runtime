@@ -14,7 +14,7 @@ class LexerTest020 extends \PHPUnit_Framework_TestCase
         $lexer = $this->lexer($input);
         while (true) {
             $token = $lexer->nextToken();
-            if ($token->type == \Antlr\Runtime\TokenConst::$EOF) {
+            if ($token->type == \Antlr\Runtime\Token::EOF) {
                 break;
             }
         }

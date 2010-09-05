@@ -63,7 +63,7 @@ class Parser extends BaseRecognizer
     protected function getMissingSymbol($input, $e, $expectedTokenType, $follow)
     {
         $tokenText = null;
-        if ($expectedTokenType == TokenConst::$EOF) {
+        if ($expectedTokenType == Token::EOF) {
             $tokenText = "<missing EOF>";
         } else {
             $tokenNames = $this->getTokenNames();
@@ -71,7 +71,7 @@ class Parser extends BaseRecognizer
         }
         $t = new CommonToken($expectedTokenType, $tokenText);
         $current = $input->LT(1);
-        if ($current->getType() === TokenConst::$EOF) {
+        if ($current->getType() === Token::EOF) {
             $current = $this->input->LT(-1);
 
             if (!$current) {

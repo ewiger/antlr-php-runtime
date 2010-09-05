@@ -14,7 +14,7 @@ class LexerTest012 extends \PHPUnit_Framework_TestCase
         $lexer = $this->lexer($input);
         while (true) {
             $token = $lexer->nextToken();
-            if ($token->type == \Antlr\Runtime\TokenConst::$EOF) {
+            if ($token->type == \Antlr\Runtime\Token::EOF) {
                 break;
             }
         }
@@ -41,7 +41,7 @@ class LexerTest012 extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('Exception');
         while(true) {
             $token = $lexer->nextToken();
-            if ($token->type == \Antlr\Runtime\TokenConst::$EOF) {
+            if ($token->type == \Antlr\Runtime\Token::EOF) {
                 break;
             }
         }
