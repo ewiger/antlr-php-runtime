@@ -18,7 +18,7 @@ scope aScope;
 
 /* rule scopes, from the book, final beta, p.147 */
 
-b[$v]
+b[v]
 scope {x}
     : {$b::x = \$v;} b2
     ;
