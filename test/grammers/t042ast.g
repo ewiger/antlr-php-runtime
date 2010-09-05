@@ -349,5 +349,5 @@ type
 
 ID : 'a'..'z' + ;
 INT : '0'..'9' +;
-WS: (' ' | '\n' | '\t')+ {$channel = \$this->HIDDEN;;};
+WS: (' ' | '\n' | '\t')+ {$channel = \self::HIDDEN;;};
 

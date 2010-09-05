@@ -67,6 +67,7 @@ use Antlr\Runtime\TokenConst;
 use Antlr\Runtime\CharStream;
 use Antlr\Runtime\CharStreamConst;
 use Antlr\Runtime\RecognizerSharedState;
+use Antlr\Runtime\ParserRuleReturnScope;
 
 use Antlr\Runtime\EarlyExitException;
 use Antlr\Runtime\FailedPredicateException;
@@ -448,13 +449,13 @@ ruleScopeCleanUp() ::= <<
 
 ruleLabelDefs() ::= <<
 <[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]
-    :{$<it.label.text>=null;}; separator="\n"
+    :{$<it.label.text> = null;}; separator="\n"
 >
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
-    :{List list_<it.label.text>=null;}; separator="\n"
+    :{$list_<it.label.text> = array();}; separator="\n"
 >
 <ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
-<ruleDescriptor.ruleListLabels:{ll|<ruleLabelType(referencedRule=ll.referencedRule)> <ll.label.text> = null;}; separator="\n">
+<ruleDescriptor.ruleListLabels:{ll|<ll.label.text> = null;}; separator="\n">
 >>
 
 lexerRuleLabelDefs() ::= <<
@@ -463,11 +464,11 @@ lexerRuleLabelDefs() ::= <<
   ruleDescriptor.ruleLabels]
     :{$<it.label.text>=null;}; separator="\n"
 >
-<ruleDescriptor.charLabels:{int <it.label.text>;}; separator="\n">
+<ruleDescriptor.charLabels:{$<it.label.text> = 0;}; separator="\n">
 <[ruleDescriptor.tokenListLabels,
   ruleDescriptor.ruleListLabels,
   ruleDescriptor.ruleListLabels]
-    :{List list_<it.label.text>=null;}; separator="\n"
+    :{\$list_<it.label.text> = array();}; separator="\n"
 >
 >>
 
@@ -701,14 +702,13 @@ tokenRefAndListLabel(token,label,elementIndex,hetero) ::= <<
 >>
 
 listLabel(label,elem) ::= <<
-if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<elem>);<\n>
+$list_<label>[] = $<elem>;<\n>
 >>
 
 /** match a character */
 charRef(char,label) ::= <<
 <if(label)>
-<label> = input.LA(1);<\n>
+$<label> = $this->input->LA(1);<\n>
 <endif>
 $this->matchChar(<char>); <checkRuleBacktrackFailure()>
 >>
@@ -716,7 +716,7 @@ $this->matchChar(<char>); <checkRuleBacktrackFailure()>
 /** match a character range */
 charRangeRef(a,b,label) ::= <<
 <if(label)>
-<label> = input.LA(1);<\n>
+$<label> = $this->input->LA(1);<\n>
 <endif>
 $this->matchRange(<a>,<b>); <checkRuleBacktrackFailure()>
 >>
@@ -725,9 +725,9 @@ $this->matchRange(<a>,<b>); <checkRuleBacktrackFailure()>
 matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 <if(label)>
 <if(LEXER)>
-<label>= input.LA(1);<\n>
+$<label> = $this->input->LA(1);<\n>
 <else>
-<label>=(<labelType>)input.LT(1);<\n>
+$<label> = $this->input->LT(1);<\n>
 <endif>
 <endif>
 if ( <s> ) {
@@ -737,8 +737,7 @@ if ( <s> ) {
     $this->state->errorRecovery=false;
 <endif>
     <if(backtracking)>$this->state->failed=false;<endif>
-}
-else {
+} else {
     <ruleBacktrackFailure()>
     $mse = new MismatchedSetException(null,$this->input);
     <@mismatchedSetException()>
@@ -764,10 +763,10 @@ matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 /** Match a string literal */
 lexerStringRef(string,label) ::= <<
 <if(label)>
-$start = getCharIndex();
-$this->match(<string>);
+$start = $this->getCharIndex();
+$this->matchString(<string>);
 <checkRuleBacktrackFailure()>
-$<label> = new CommonToken($input, TokenConst::$EOF, Token::DEFAULT_CHANNEL, $start<elementIndex>, $this->getCharIndex()-1);
+$<label> = new CommonToken($this->input, TokenConst::$INVALID_TOKEN_TYPE, Token::DEFAULT_CHANNEL, $start, $this->getCharIndex()-1);
 <else>
 $this->matchString(<string>); <checkRuleBacktrackFailure()><\n>
 <endif>
@@ -775,7 +774,7 @@ $this->matchString(<string>); <checkRuleBacktrackFailure()><\n>
 
 wildcard(label,elementIndex) ::= <<
 <if(label)>
-<label>=$this->input->LT(1);<\n>
+$<label> = $this->input->LT(1);<\n>
 <endif>
 $this->matchAny($this->input); <checkRuleBacktrackFailure()>
 >>
@@ -788,7 +787,7 @@ wildcardAndListLabel(label,elementIndex) ::= <<
 /** Match . wildcard in lexer */
 wildcardChar(label, elementIndex) ::= <<
 <if(label)>
-<label> = input.LA(1);<\n>
+$<label> = $this->input->LA(1);<\n>
 <endif>
 $this->matchAny(); <checkRuleBacktrackFailure()>
 >>
@@ -806,7 +805,7 @@ wildcardCharListLabel(label, elementIndex) ::= <<
  */
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
 $this->pushFollow(self::$FOLLOW_<rule.name>_in_<ruleName><elementIndex>);
-<if(label)>$<label>=<endif>$this-><if(scope)><scope:delegateName()>-><endif><rule.name>(<args; separator=", ">);<\n>
+<if(label)>$<label> = <endif>$this-><if(scope)><scope:delegateName()>-><endif><rule.name>(<args; separator=", ">);<\n>
 $this->state->_fsp--;
 <checkRuleBacktrackFailure()>
 >>
@@ -842,11 +841,11 @@ lexerRuleRefAndListLabel(rule,label,args,elementIndex,scope) ::= <<
 /** EOF in the lexer */
 lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
-int <label>Start<elementIndex> = getCharIndex();
-$this->match(self::T_EOF); <checkRuleBacktrackFailure()>
-<labelType> <label> = new CommonToken(input, EOF, Token::DEFAULT_CHANNEL, <label>Start<elementIndex>, getCharIndex()-1);
+$<label>Start<elementIndex> = $this->getCharIndex();
+$this->matchChar(self::T_EOF); <checkRuleBacktrackFailure()>
+$<label> = new CommonToken($this->input, self::T_EOF, Token::DEFAULT_CHANNEL, $<label>Start<elementIndex>, $this->getCharIndex()-1);
 <else>
-$this->match(self::T_EOF); <checkRuleBacktrackFailure()>
+$this->matchChar(self::T_EOF); <checkRuleBacktrackFailure()>
 <endif>
 >>
 
@@ -1213,7 +1212,6 @@ $<label.label.text> = null;<\n>
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 public static function <ruleDescriptor:returnStructName()>() {
-	require_once '<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope.php';
     $retval = new <if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope();
 	<scope.attributes:{$retval-><it.name>=null;}; separator="\n">
     <@ruleReturnMembers()>
@@ -1223,7 +1221,7 @@ public static function <ruleDescriptor:returnStructName()>() {
 >>
 
 parameterScope(scope) ::= <<
-<scope.attributes:{<it.decl>}; separator=", ">
+<scope.attributes:{$<it.decl>}; separator=", ">
 >>
 
 parameterAttributeRef(attr) ::= "<attr.name>"

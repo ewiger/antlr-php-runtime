@@ -55,12 +55,12 @@ class ParserRuleReturnScope extends RuleReturnScope
 
     public function getStart()
     {
-        return start;
+        return $this->start;
     }
 
     public function getStop()
     {
-        return stop;
+        return $this->stop;
     }
 
 }

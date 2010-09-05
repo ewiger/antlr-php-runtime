@@ -7,7 +7,7 @@ use Antlr\Runtime\CommonTokenStream;
 require_once 'generated/t034tokenLabelPropertyRefLexer.php';
 require_once 'generated/t034tokenLabelPropertyRefParser.php';
 
-class Lexer034Test extends \PHPUnit_Framework_TestCase
+class Parser034Test extends \PHPUnit_Framework_TestCase
 {
     public function testValid()
     {

@@ -5,13 +5,7 @@ options {
 
 A: 'a'..'z' WS '0'..'9'
         {
-            print $WS
-            print $WS.type
-            print $WS.line
-            print $WS.pos
-            print $WS.channel
-            print $WS.index
-            print $WS.text
+
         }
     ;
 
@@ -23,6 +17,6 @@ fragment WS  :
             |	'\r'
             )
         )+
-        { $channel = \$this->HIDDEN; }
+        { $channel = self::HIDDEN; }
     ;    
 

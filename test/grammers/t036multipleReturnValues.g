@@ -20,6 +20,6 @@ WS  :
             |	'\r'
             )
         )+
-        { $channel = \$this->HIDDEN; }
+        { $channel = self::HIDDEN; }
     ;    
 

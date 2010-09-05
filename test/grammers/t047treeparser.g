@@ -109,5 +109,5 @@ WS  :   (   ' '
         |   '\r'
         |   '\n'
         )+
-        { $channel=\$this->HIDDEN; }
+        { $channel=self::HIDDEN; }
     ;    

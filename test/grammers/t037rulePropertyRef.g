@@ -5,11 +5,11 @@ options {
 
 a returns [bla]
 @after {
-    $bla = $start . $stop . $text
+    \$bla = array($start, $stop, $text);
 }
     : A+
     ;
 
 A: 'a'..'z';
 
-WS: ' '+  { $channel = \$this->HIDDEN; };
+WS: ' '+  { $channel = self::HIDDEN; };
