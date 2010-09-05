@@ -217,7 +217,7 @@ class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
 
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     
-    <bitsets:{static $FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>;<\n>}>
+    <bitsets:{static public $FOLLOW_<it.name>_in_<it.inName><it.tokenIndex> = array(<it.tokenTypes:{<it> => <it>};separator=", ">);<\n>}>
     
     <cyclicDFAs:{dfa | protected $dfa<dfa.decisionNumber>;}; separator="\n">
     
@@ -235,7 +235,6 @@ class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
         <last(grammar.delegators):{g|$this->gParent = $this-><g:delegateName()>;}>
         
         <cyclicDFAs:{dfa | $this->dfa<dfa.decisionNumber> = new <grammar.recognizerName>_DFA<dfa.decisionNumber>($this);}; separator="\n">
-        
     }
     <@end>
 
@@ -258,10 +257,6 @@ class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
 }
 
 <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>
-
-
-
-<bitsets:{<grammar.recognizerName>::$FOLLOW_<it.name>_in_<it.inName><it.tokenIndex> = new Set(array(<it.tokenTypes:{<it>};separator=", ">));<\n>}>
 >>
 
 parserCtorBody() ::= <<
