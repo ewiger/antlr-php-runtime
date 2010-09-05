@@ -57,7 +57,7 @@ abstract class BaseRecognizer
      *
      * @param TokenStream $input
      * @param int $ttype
-     * @param bool $follow
+     * @param Set $follow
      */
     public function match($input, $ttype, $follow)
     {
@@ -94,14 +94,15 @@ abstract class BaseRecognizer
         if ($follow == null) {
             // we have no information about the follow; we can only consume
             // a single token and hope for the best
-            return $false;
+            return false;
         }
         // compute what can follow this grammar element reference
-        if ($follow->member(Token::EOR_TOKEN_TYPE)) {
+        if (isset($follow[Token::EOR_TOKEN_TYPE])) {
             $viableTokensFollowingThisRule = $this->computeContextSensitiveRuleFOLLOW();
-            $follow = $follow->union($viableTokensFollowingThisRule);
+            $follow = array_merge($follow, $viableTokensFollowingThisRule);
+            $follow = array_combine($follow, $follow);
             if ($this->state->_fsp >= 0) { // remove EOR if we're not the start symbol
-                $follow->remove(Token::EOR_TOKEN_TYPE);
+                unset($follow[Token::EOR_TOKEN_TYPE]);
             }
         }
         // if current token is consistent with what could come after set
@@ -112,7 +113,7 @@ abstract class BaseRecognizer
         // BitSet cannot handle negative numbers like -1 (EOF) so I leave EOR
         // in follow set to indicate that the fall of the start symbol is
         // in the set (EOF can follow).
-        if ($follow->member($input->LA(1)) || $follow->member(Token::EOR_TOKEN_TYPE)) {
+        if (isset($follow[$input->LA(1)]) || isset($follow[Token::EOR_TOKEN_TYPE])) {
             //System.out.println("LT(1)=="+((TokenStream)input).LT(1)+" is consistent with what follows; inserting...");
             return true;
         }
@@ -502,21 +503,22 @@ abstract class BaseRecognizer
     protected function combineFollows($exact)
     {
         $top = $this->state->_fsp;
-        $followSet = new Set(array());
+        $followSet = array();
         for ($i = $top; $i >= 0; $i--) {
             $localFollowSet = $this->state->following[$i];
             /*
               System.out.println("local follow depth "+i+"="+
               localFollowSet.toString(getTokenNames())+")");
              */
-            $followSet->unionInPlace($localFollowSet);
+            $followSet = array_merge($followSet, $localFollowSet);
+            $followSet = array_combine($followSet, $followSet);
             if ($exact) {
                 // can we see end of rule?
-                if ($localFollowSet->member(Token::EOR_TOKEN_TYPE)) {
+                if (isset($localFollowSet[Token::EOR_TOKEN_TYPE])) {
                     // Only leave EOR in set if at top (start rule); this lets
                     // us know if have to include follow(start rule); i.e., EOF
                     if ($i > 0) {
-                        $followSet->remove(Token::EOR_TOKEN_TYPE);
+                        unset($followSet[Token::EOR_TOKEN_TYPE]);
                     }
                 } else { // can't see end of rule, quit
                     break;
@@ -588,12 +590,18 @@ abstract class BaseRecognizer
         throw $e;
     }
 
-    /** Not currently used */
+    /**
+     * Not currently used
+     *
+     * @var TokenStream $input
+     * @var mixed $e
+     * @var array $follow
+     */
     public function recoverFromMismatchedSet($input, $e, $follow)
     {
         if ($this->mismatchIsMissingToken($input, $follow)) {
             // System.out.println("missing token");
-            reportError($e);
+            $this->reportError($e);
             // we don't know how to conjure up a token for sets yet
             return $this->getMissingSymbol($input, $e, Token::INVALID_TOKEN_TYPE, $follow);
         }
@@ -615,7 +623,8 @@ abstract class BaseRecognizer
         return null;
     }
 
-    /** Conjure up a missing token during error recovery.
+    /**
+     *  Conjure up a missing token during error recovery.
      *
      *  The recognizer attempts to recover from single missing
      *  symbols. But, actions might refer to that missing symbol.
@@ -633,6 +642,11 @@ abstract class BaseRecognizer
      *  a CommonToken of the appropriate type. The text will be the token.
      *  If you change what tokens must be created by the lexer,
      *  override this method to create the appropriate tokens.
+     *
+     * @var TokenStream $input
+     * @var mixed $e
+     * @var int $expectedTokenType
+     * @var array $follow
      */
     protected function getMissingSymbol($input, $e, $expectedTokenType, $follow)
     {
@@ -654,7 +668,7 @@ abstract class BaseRecognizer
     {
         //System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
         $ttype = $input->LA(1);
-        while ($ttype != Token::EOF && !$set->member($ttype)) {
+        while ($ttype != Token::EOF && !isset($set[$ttype])) {
             //System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
             $input->consume();
             $ttype = $input->LA(1);

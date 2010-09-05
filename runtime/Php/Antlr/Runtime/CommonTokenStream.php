@@ -171,9 +171,9 @@ class CommonTokenStream implements TokenStream
     public function discardTokenType($ttype)
     {
         if ($this->discardSet == null) {
-            $this->discardSet = new Set();
+            $this->discardSet = array();
         }
-        $this->discardSet . add($ttype);
+        $this->discardSet[$ttype];
     }
 
     public function discardOffChannelTokens($discardOffChannelTokens)
@@ -181,6 +181,10 @@ class CommonTokenStream implements TokenStream
         $this->discardOffChannelTokens = $discardOffChannelTokens;
     }
 
+    /**
+     * @todo why does this have no parameters? other methods are calling it with parameters.
+     * @return <type>
+     */
     public function getTokens()
     {
         if ($this->p == -1) {
@@ -191,6 +195,7 @@ class CommonTokenStream implements TokenStream
 
     public function getTokensBetween($start, $stop)
     {
+        // TODO: This can't be right!
         return $this->getTokens($start, $stop, null);
     }
 
@@ -229,12 +234,12 @@ class CommonTokenStream implements TokenStream
 
     public function getTokensOfTypeInArray($start, $stop, $types)
     {
-        return $this->getTokens($start, $stop, new Set(types));
+        return $this->getTokens($start, $stop, $types);
     }
 
-    public function getTokensofType($start, $stop, $ttype)
+    public function getTokensOfType($start, $stop, $ttype)
     {
-        return $this->getTokens($start, $stop, new Set(array(ttype)));
+        return $this->getTokens($start, $stop, array($ttype));
     }
 
     /** Get the ith token from the current position 1..n where k=1 is the

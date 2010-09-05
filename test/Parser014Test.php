@@ -42,7 +42,7 @@ class ParserTest014 extends \PHPUnit_Framework_TestCase
         self::assertTrue(sizeof($parser->reportedErrors) == 1);
         # FIXME: currently strings with formatted errors are collected
         # can't check error locations yet
-        self::assertEquals($parser->events, array(array('call', 'gnarz')));
+        self::assertEquals(array(array('call', 'gnarz')), $parser->events);
     }
 
     function testMalformedInput3()
@@ -53,10 +53,7 @@ class ParserTest014 extends \PHPUnit_Framework_TestCase
         # FIXME: currently strings with formatted errors are collected
         # can't check error locations yet
         self::assertTrue(sizeof($parser->reportedErrors) == 1);
-        self::assertEquals($parser->events,
-                        array(
-                            array('call', 'gnarz'),
-                            array('call', 'flupp')));
+        self::assertEquals(array(array('call', 'gnarz'), array('call', 'flupp')), $parser->events);
     }
 
     function parser($expr)
