@@ -1,119 +1,139 @@
+<?php
+
 /*
- [The "BSD licence"]
- Copyright (c) 2005-2008 Terence Parr
- All rights reserved.
+  [The "BSD licence"]
+  Copyright (c) 2005-2008 Terence Parr
+  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
- 1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
- 3. The name of the author may not be used to endorse or promote products
-    derived from this software without specific prior written permission.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote products
+  derived from this software without specific prior written permission.
 
- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-package org.antlr.runtime.tree;
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
-import org.antlr.runtime.Token;
+namespace Antlr\Runtime\Tree;
 
-import java.util.List;
+use Antlr\Runtime\Token;
 
 /** A record of the rules used to match a token sequence.  The tokens
  *  end up as the leaves of this tree and rule nodes are the interior nodes.
  *  This really adds no functionality, it is just an alias for CommonTree
  *  that is more meaningful (specific) and holds a String to display for a node.
  */
-public class ParseTree extends BaseTree {
-	public Object payload;
-	public List hiddenTokens;
+class ParseTree extends BaseTree
+{
 
-	public ParseTree(Object label) {
-		this.payload = label;
-	}
+    public $payload;
+    public $hiddenTokens;
 
-	public Tree dupNode() {
-		return null;
-	}
+    public function __construct($label)
+    {
+        $this->payload = $label;
+    }
 
-	public int getType() {
-		return 0;
-	}
+    public function dupNode()
+    {
+        return null;
+    }
 
-	public String getText() {
-		return toString();
-	}
+    public function getType()
+    {
+        return 0;
+    }
 
-	public int getTokenStartIndex() {
-		return 0;
-	}
+    public function getText()
+    {
+        return toString();
+    }
 
-	public void setTokenStartIndex(int index) {
-	}
+    public function getTokenStartIndex()
+    {
+        return 0;
+    }
 
-	public int getTokenStopIndex() {
-		return 0;
-	}
+    public function setTokenStartIndex($index)
+    {
+        
+    }
 
-	public void setTokenStopIndex(int index) {
-	}
+    public function getTokenStopIndex()
+    {
+        return 0;
+    }
 
-	public String toString() {
-		if ( payload instanceof Token ) {
-			Token t = (Token)payload;
-			if ( t.getType() == Token.EOF ) {
-				return "<EOF>";
-			}
-			return t.getText();
-		}
-		return payload.toString();
-	}
+    public function setTokenStopIndex($index)
+    {
 
-	/** Emit a token and all hidden nodes before.  EOF node holds all
-	 *  hidden tokens after last real token.
-	 */
-	public String toStringWithHiddenTokens() {
-		StringBuffer buf = new StringBuffer();
-		if ( hiddenTokens!=null ) {
-			for (int i = 0; i < hiddenTokens.size(); i++) {
-				Token hidden = (Token) hiddenTokens.get(i);
-				buf.append(hidden.getText());
-			}
-		}
-		String nodeText = this.toString();
-		if ( !nodeText.equals("<EOF>") ) buf.append(nodeText);
-		return buf.toString();
-	}
+    }
 
-	/** Print out the leaves of this tree, which means printing original
-	 *  input back out.
-	 */
-	public String toInputString() {
-		StringBuffer buf = new StringBuffer();
-		_toStringLeaves(buf);
-		return buf.toString();
-	}
+    public function toString()
+    {
+        if ($this->payload instanceof Token) {
+            $t = $this->payload;
+            if ($t->getType() == Token::EOF) {
+                return "<EOF>";
+            }
+            return $t->getText();
+        }
+        return $this->payload->toString();
+    }
 
-	public void _toStringLeaves(StringBuffer buf) {
-		if ( payload instanceof Token ) { // leaf node token?
-			buf.append(this.toStringWithHiddenTokens());
-			return;
-		}
-		for (int i = 0; children!=null && i < children.size(); i++) {
-			ParseTree t = (ParseTree)children.get(i);
-			t._toStringLeaves(buf);
-		}
-	}
+    /** Emit a token and all hidden nodes before.  EOF node holds all
+     *  hidden tokens after last real token.
+     */
+    public function toStringWithHiddenTokens()
+    {
+        $buf = "";
+        if ($this->hiddenTokens != null) {
+            $nht = count($hiddenTokens);
+            for ($i = 0; $i < $nht; ++$i) {
+                $hidden = $this->hiddenTokens[$i];
+                $buf .= $hidden->getText();
+            }
+        }
+        $nodeText = $this->toString();
+        if (!$nodeText->equals("<EOF>")) {
+            $buf .= $nodeText;
+        }
+        return $buf;
+    }
+
+    /** Print out the leaves of this tree, which means printing original
+     *  input back out.
+     */
+    public function toInputString()
+    {
+        $buf = "";
+        return $this->_toStringLeaves($buf);
+    }
+
+    public function _toStringLeaves($buf)
+    {
+        if ($this->payload instanceof Token) { // leaf node token?
+            $buf .= $this->toStringWithHiddenTokens();
+            return;
+        }
+        for ($i = 0; $this->children != null && $i < count($this->children); ++$i) {
+            $t = $this->children[$i];
+            $buf = $this->_toStringLeaves($buf);
+        }
+    }
+
 }

@@ -1,3 +1,4 @@
+<?php
 /*
  [The "BSD licence"]
  Copyright (c) 2005-2008 Terence Parr
@@ -25,31 +26,10 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.runtime.tree;
+namespace Antlr\Runtime\Tree;
 
-import java.util.List;
+class RewriteRuleSubtreeStream extends RewriteRuleElementStream {
 
-public class RewriteRuleSubtreeStream extends RewriteRuleElementStream {
-
-	public RewriteRuleSubtreeStream(TreeAdaptor adaptor, String elementDescription) {
-		super(adaptor, elementDescription);
-	}
-
-	/** Create a stream with one element */
-	public RewriteRuleSubtreeStream(TreeAdaptor adaptor,
-									String elementDescription,
-									Object oneElement)
-	{
-		super(adaptor, elementDescription, oneElement);
-	}
-
-	/** Create a stream, but feed off an existing list */
-	public RewriteRuleSubtreeStream(TreeAdaptor adaptor,
-									String elementDescription,
-									List elements)
-	{
-		super(adaptor, elementDescription, elements);
-	}
 
 	/** Treat next element as a single node even if it's a subtree.
 	 *  This is used instead of next() when the result has to be a
@@ -64,20 +44,20 @@ public class RewriteRuleSubtreeStream extends RewriteRuleElementStream {
 	 *  a proper way to refactor.  This needs to always call dup node
 	 *  and super.next() doesn't know which to call: dup node or dup tree.
 	 */
-	public Object nextNode() {
-		int n = size();
-		if ( dirty || (cursor>=n && n==1) ) {
+	public function nextNode() {
+		$n = $this->size();
+		if ( $this->dirty || ($this->cursor>=$n && $n==1) ) {
 			// if out of elements and size is 1, dup (at most a single node
 			// since this is for making root nodes).
-			Object el = _next();
-			return adaptor.dupNode(el);
+			$el = $this->_next();
+			return $this->adaptor->dupNode($el);
 		}
 		// test size above then fetch
-		Object el = _next();
-		return el;
+		$el = $this->_next();
+		return $el;
 	}
 
-	protected Object dup(Object el) {
-		return adaptor.dupTree(el);
+	protected function dup($el) {
+		return $this->adaptor->dupTree($el);
 	}
 }

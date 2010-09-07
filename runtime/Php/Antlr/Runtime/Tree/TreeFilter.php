@@ -32,11 +32,10 @@ use Antlr\Runtime\RecognizerSharedState;
 use Antlr\Runtime\RecognitionException;
 use Antlr\Runtime\TokenStream;
 
-class TreeFilter extends TreeParser {
-    /*
-    public interface fptr {
-        public function rule() throws RecognitionException;
-    }*/
+class TreeFilter extends TreeParser
+{
+    const RULE_BOTTOMUP = 1;
+    const RULE_TOPDOWN  = 2;
 
     protected $originalTokenStream;
     protected $originalAdaptor;
@@ -48,7 +47,8 @@ class TreeFilter extends TreeParser {
         $originalTokenStream = $input->getTokenStream();
     }
 
-    public function applyOnce($t, $whichRule) {
+    public function applyOnce($t, $whichRule)
+    {
         if ( $t==null ) {
             return;
         }
@@ -59,36 +59,56 @@ class TreeFilter extends TreeParser {
             $input = new CommonTreeNodeStream($this->originalAdaptor, $t);
             $this->input->setTokenStream($this->originalTokenStream);
             $this->setBacktrackingLevel(1);
-            // @TODO$whichRule.rule();
+            switch ($whichRule) {
+                case self::RULE_BOTTOMUP:
+                    $this->bottomup();
+                    break;
+                case self::RULE_TOPDOWN:
+                    $this->topdown();
+                    break;
+            }
             $this->setBacktrackingLevel(0);
         }
         catch (RecognitionException $e) {  }
     }
 
-    public function downup(Object t) {
-        TreeVisitor v = new TreeVisitor(new CommonTreeAdaptor());
-        TreeVisitorAction actions = new TreeVisitorAction() {
-            public Object pre(Object t)  { applyOnce(t, topdown_fptr); return t; }
-            public Object post(Object t) { applyOnce(t, bottomup_fptr); return t; }
-        };
-        v.visit(t, actions);
+    public function downup($t)
+    {
+        $v = new TreeVisitor(new CommonTreeAdaptor());
+        $actions = new ApplyVisitorAction();
+        $v->visit($t, $actions);
     }
-        
-    fptr topdown_fptr = new fptr() {
-        public function rule() throws RecognitionException {
-            topdown();
-        }
-    };
-
-    fptr bottomup_fptr = new fptr() {
-        public function rule() throws RecognitionException {
-            bottomup();
-        }
-    };
 
     // methods the downup strategy uses to do the up and down rules.
     // to override, just define tree grammar rule topdown and turn on
     // filter=true.
-    public function topdown() throws RecognitionException {;}
-    public function bottomup() throws RecognitionException {;}
+    public function topdown()
+    {
+    }
+
+    public function bottomup()
+    {
+    }
+}
+
+class ApplyVisitorAction implements TreeVisitorAction
+{
+    private $filter;
+
+    public function __construct(TreeFilter $filter)
+    {
+        $this->filter = $filter;
+    }
+
+    public function pre($t)
+    {
+        $this->filter->applyOnce($t, TreeFilter::RULE_TOPDOWN);
+        return $t;
+    }
+
+    public function post($t)
+    {
+        $this->filter->applyOnce($t, TreeFilter::RULE_BOTTOMUP);
+        return $t;
+    }
 }

@@ -1,156 +1,165 @@
+<?php
+
 /*
- [The "BSD licence"]
- Copyright (c) 2005-2008 Terence Parr
- All rights reserved.
+  [The "BSD licence"]
+  Copyright (c) 2005-2008 Terence Parr
+  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
- 1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
- 3. The name of the author may not be used to endorse or promote products
-    derived from this software without specific prior written permission.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote products
+  derived from this software without specific prior written permission.
 
- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-package org.antlr.runtime.tree;
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
-import org.antlr.runtime.Token;
-import org.antlr.runtime.CommonToken;
+namespace Antlr\Runtime\Tree;
 
-public class TreePatternParser {
-	protected TreePatternLexer tokenizer;
-	protected int ttype;
-	protected TreeWizard wizard;
-	protected TreeAdaptor adaptor;
+use Antlr\Runtime\Token;
+use Antlr\Runtime\CommonToken;
 
-	public TreePatternParser(TreePatternLexer tokenizer, TreeWizard wizard, TreeAdaptor adaptor) {
-		this.tokenizer = tokenizer;
-		this.wizard = wizard;
-		this.adaptor = adaptor;
-		ttype = tokenizer.nextToken(); // kickstart
-	}
+class TreePatternParser
+{
+    /** @var TreePatternLexer */
+    protected $tokenizer;
+    /** @var Token */
+    protected $ttype;
+    /** @var TreeWizard */
+    protected $wizard;
+    /** @var TreeAdaptor */
+    protected $adaptor;
 
-	public Object pattern() {
-		if ( ttype==TreePatternLexer.BEGIN ) {
-			return parseTree();
-		}
-		else if ( ttype==TreePatternLexer.ID ) {
-			Object node = parseNode();
-			if ( ttype==TreePatternLexer.EOF ) {
-				return node;
-			}
-			return null; // extra junk on end
-		}
-		return null;
-	}
+    public function __construct(TreePatternLexer $tokenizer, TreeWizard $wizard, TreeAdaptor $adaptor)
+    {
+        $this->tokenizer = $tokenizer;
+        $this->wizard = $wizard;
+        $this->adaptor = $adaptor;
+        $this->ttype = $tokenizer->nextToken(); // kickstart
+    }
 
-	public Object parseTree() {
-		if ( ttype != TreePatternLexer.BEGIN ) {
-			System.out.println("no BEGIN");
-			return null;
-		}
-		ttype = tokenizer.nextToken();
-		Object root = parseNode();
-		if ( root==null ) {
-			return null;
-		}
-		while ( ttype==TreePatternLexer.BEGIN ||
-				ttype==TreePatternLexer.ID ||
-				ttype==TreePatternLexer.PERCENT ||
-				ttype==TreePatternLexer.DOT )
-		{
-			if ( ttype==TreePatternLexer.BEGIN ) {
-				Object subtree = parseTree();
-				adaptor.addChild(root, subtree);
-			}
-			else {
-				Object child = parseNode();
-				if ( child==null ) {
-					return null;
-				}
-				adaptor.addChild(root, child);
-			}
-		}
-		if ( ttype != TreePatternLexer.END ) {
-			System.out.println("no END");
-			return null;
-		}
-		ttype = tokenizer.nextToken();
-		return root;
-	}
+    public function pattern()
+    {
+        if ($ttype == TreePatternLexer::BEGIN) {
+            return $this->parseTree();
+        } else if ($ttype == TreePatternLexer::ID) {
+            $node = $this->parseNode();
+            if ($ttype == TreePatternLexer::EOF) {
+                return $node;
+            }
+            return null; // extra junk on end
+        }
+        return null;
+    }
 
-	public Object parseNode() {
-		// "%label:" prefix
-		String label = null;
-		if ( ttype == TreePatternLexer.PERCENT ) {
-			ttype = tokenizer.nextToken();
-			if ( ttype != TreePatternLexer.ID ) {
-				return null;
-			}
-			label = tokenizer.sval.toString();
-			ttype = tokenizer.nextToken();
-			if ( ttype != TreePatternLexer.COLON ) {
-				return null;
-			}
-			ttype = tokenizer.nextToken(); // move to ID following colon
-		}
+    public function parseTree()
+    {
+        if ($this->ttype != TreePatternLexer::BEGIN) {
+            echo("no BEGIN\n");
+            return null;
+        }
+        $this->ttype = $this->tokenizer->nextToken();
+        $root = $this->parseNode();
+        if ($root == null) {
+            return null;
+        }
+        while ($this->ttype == TreePatternLexer::BEGIN ||
+        $this->ttype == TreePatternLexer::ID ||
+        $this->ttype == TreePatternLexer::PERCENT ||
+        $this->ttype == TreePatternLexer::DOT) {
+            if ($this->ttype == TreePatternLexer::BEGIN) {
+                $subtree = $this->parseTree();
+                $this->adaptor->addChild($root, $subtree);
+            } else {
+                $child = $this->parseNode();
+                if ($child == null) {
+                    return null;
+                }
+                $this->adaptor->addChild($root, $child);
+            }
+        }
+        if ($this->ttype != TreePatternLexer::END) {
+            echo("no END\n");
+            return null;
+        }
+        $this->ttype = $this->tokenizer->nextToken();
+        return $root;
+    }
 
-		// Wildcard?
-		if ( ttype == TreePatternLexer.DOT ) {
-			ttype = tokenizer.nextToken();
-			Token wildcardPayload = new CommonToken(0, ".");
-			TreeWizard.TreePattern node =
-				new TreeWizard.WildcardTreePattern(wildcardPayload);
-			if ( label!=null ) {
-				node.label = label;
-			}
-			return node;
-		}
+    public function parseNode()
+    {
+        // "%label:" prefix
+        $label = null;
+        if ($this->ttype == TreePatternLexer::PERCENT) {
+            $this->ttype = $this->tokenizer->nextToken();
+            if ($this->ttype != TreePatternLexer::ID) {
+                return null;
+            }
+            $this->label = $this->tokenizer->sval;
+            $this->ttype = $this->tokenizer->nextToken();
+            if ($this->ttype != TreePatternLexer::COLON) {
+                return null;
+            }
+            $this->ttype = $this->tokenizer->nextToken(); // move to ID following colon
+        }
 
-		// "ID" or "ID[arg]"
-		if ( ttype != TreePatternLexer.ID ) {
-			return null;
-		}
-		String tokenName = tokenizer.sval.toString();
-		ttype = tokenizer.nextToken();
-		if ( tokenName.equals("nil") ) {
-			return adaptor.nil();
-		}
-		String text = tokenName;
-		// check for arg
-		String arg = null;
-		if ( ttype == TreePatternLexer.ARG ) {
-			arg = tokenizer.sval.toString();
-			text = arg;
-			ttype = tokenizer.nextToken();
-		}
-		
-		// create node
-		int treeNodeType = wizard.getTokenType(tokenName);
-		if ( treeNodeType==Token.INVALID_TOKEN_TYPE ) {
-			return null;
-		}
-		Object node;
-		node = adaptor.create(treeNodeType, text);
-		if ( label!=null && node.getClass()==TreeWizard.TreePattern.class ) {
-			((TreeWizard.TreePattern)node).label = label;
-		}
-		if ( arg!=null && node.getClass()==TreeWizard.TreePattern.class ) {
-			((TreeWizard.TreePattern)node).hasTextArg = true;
-		}
-		return node;
-	}
+        // Wildcard?
+        if ($this->ttype == TreePatternLexer::DOT) {
+            $this->ttype = $this->tokenizer->nextToken();
+            $wildcardPayload = new CommonToken(0, ".");
+
+            //TreeWizard.TreePattern node = new TreeWizard.WildcardTreePattern(wildcardPayload); // TODO
+
+            if (§label != null) {
+                $node->label = $label;
+            }
+            return $node;
+        }
+
+        // "ID" or "ID[arg]"
+        if ($this->ttype != TreePatternLexer::ID) {
+            return null;
+        }
+        $tokenName = $this->tokenizer->sval;
+        $this->ttype = $this->tokenizer->nextToken();
+        if ($tokenName->equals("nil")) {
+            return $this->adaptor->nil();
+        }
+        $text = $tokenName;
+        // check for arg
+        $arg = null;
+        if ($this->ttype == TreePatternLexer::ARG) {
+            $arg = $this->tokenizer->sval;
+            $text = $arg;
+            $this->ttype = $this->tokenizer->nextToken();
+        }
+
+        // create node
+        $treeNodeType = $this->wizard->getTokenType($tokenName);
+        if ($treeNodeType == Token::INVALID_TOKEN_TYPE) {
+            return null;
+        }
+        $node = $this->adaptor->create($treeNodeType, $text);
+        if ($label != null && get_class($node) == "Antlr\Runtime\Tree\TreePattern") {
+            $node->label = $label;
+        }
+        if ($arg != null && get_class($node) == "Antlr\Runtime\Tree\TreePattern") {
+            $node->hasTextArg = true;
+        }
+        return $node;
+    }
 }
