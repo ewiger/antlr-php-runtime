@@ -50,7 +50,7 @@ class RewriteRuleNodeStream extends RewriteRuleElementStream
     {
         // we dup every node, so don't have to worry about calling dup; short-
         // circuited next() so it doesn't call.
-        throw new BadMethodCall("dup can't be called for a node stream.");
+        throw new \BadMethodCall("dup can't be called for a node stream.");
     }
 
 }

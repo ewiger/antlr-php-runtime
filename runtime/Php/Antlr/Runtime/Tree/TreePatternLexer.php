@@ -99,7 +99,7 @@ class TreePatternLexer
             }
             if ($this->c == '[') { // grab [x] as a string, returning x
                 $this->consume();
-                while (c != ']') {
+                while ($this->c != ']') {
                     if ($this->c == '\\') {
                         $this->consume();
                         if ($this->c != ']') {
@@ -125,9 +125,9 @@ class TreePatternLexer
     {
         $this->p++;
         if ($this->p >= $this->n) {
-            $this->c = EOF;
+            $this->c = self::EOF;
         } else {
-            $this->c = pattern . charAt(p);
+            $this->c = substr($this->pattern, $this->p, 1);
         }
     }
 

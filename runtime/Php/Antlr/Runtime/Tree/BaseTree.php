@@ -37,7 +37,7 @@ namespace Antlr\Runtime\Tree;
  * an empty node whose children represent the list.  An empty, but
  * non-null node is called "nil".
  */
-class BaseTree implements Tree
+abstract class BaseTree implements Tree
 {
 
     protected $children = null;
@@ -117,16 +117,16 @@ class BaseTree implements Tree
                     // no children for this but t has children; just set pointer
                     // call general freshener routine
                     $this->children = $childTree->children;
-                    $this->freshenParentAndChildIndexes();
+                    $this->freshenAllParentAndChildIndexes();
                 }
             }
         } else { // child is not nil (don't care about children)
             if ($this->children == null) {
                 $this->children = $this->createChildrenList(); // create children list on demand
             }
-            $this->children[t];
-            $childTree->setParent(this);
-            $childTree->setChildIndex(count($this->children . size()) - 1);
+            $this->children[] = $t;
+            $childTree->setParent($this);
+            $childTree->setChildIndex(count($this->children) - 1);
         }
         // System.out.println("now children are: "+children);
     }
@@ -175,7 +175,7 @@ class BaseTree implements Tree
      * For huge child lists, inserting children can force walking rest of
      * children to set their childindex; could be slow.
      */
-    public function replaceChildren($startChildIndex, $stopChildIndex, $t)
+    public function replaceChildren($startChildIndex, $stopChildIndex, $newTree)
     {
         /*
           System.out.println("replaceChildren "+startChildIndex+", "+stopChildIndex+
@@ -183,10 +183,9 @@ class BaseTree implements Tree
           System.out.println("in="+toStringTree());
          */
         if ($this->children == null) {
-            throw new IllegalArgumentException("indexes invalid; no children in list");
+            throw new \InvalidArgumentException("indexes invalid; no children in list");
         }
         $replacingHowMany = $stopChildIndex - $startChildIndex + 1;
-        $newTree = $t;
         $newChildren = array();
         // normalize to a list of children to add: newChildren
         if ($newTree->isNil()) {
@@ -202,32 +201,17 @@ class BaseTree implements Tree
         if ($delta == 0) {
             $j = 0; // index into new children
             for ($i = $startChildIndex; $i <= $stopChildIndex; $i++) {
-                $child = $newChildren[$j];
-                $this->children[$i] = $child;
-                $child->setParent($this);
-                $child->setChildIndex($i);
+                $this->children[$i] = $newChildren[$j];
+                $this->children[$i]->setParent($this);
+                $this->children[$i]->setChildIndex($i);
                 $j++;
             }
-        } else if ($delta > 0) { // fewer new nodes than there were
-            // set children and then delete extra
-            for ($j = 0; $j < $numNewChildren; $j++) {
-                $this->children[$startChildIndex + $j] = $newChildren[$j];
-            }
-            $indexToDelete = $startChildIndex + $numNewChildren;
-            for ($c = $indexToDelete; $c <= $stopChildIndex; $c++) {
-                // delete same index, shifting everybody down each time
-                unset($this->children[$indexToDelete]);
-            }
-            $this->freshenParentAndChildIndexes($startChildIndex);
-        } else { // more new nodes than were there before
-            // fill in as many children as we can (replacingHowMany) w/o moving data
-            for ($j = 0; $j < $replacingHowMany; $j++) {
-                $this->children[$startChildIndex + $j] = $newChildren[$j];
-            }
-            $numToInsert = $replacingWithHowMany - $replacingHowMany;
-            for ($j = $replacingHowMany; $j < $replacingWithHowMany; $j++) {
-                $this->children[$startChildIndex + $j] = $newChildren[$j];
-            }
+        } else { // uber-optimization compared to Java code
+            $this->children = array_merge(
+                array_slice($this->children, 0, $startChildIndex),
+                $newChildren,
+                array_slice($this->children, $stopChildIndex+1)
+            );
             $this->freshenParentAndChildIndexes($startChildIndex);
         }
         //System.out.println("out="+toStringTree());
@@ -372,7 +356,4 @@ class BaseTree implements Tree
     {
         return 0;
     }
-
-    /** Override to say how a node (not a tree) should look as text */
-    public abstract function toString();
 }

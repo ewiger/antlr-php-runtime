@@ -75,7 +75,7 @@ interface Tree
     public function setChildIndex($index);
 
     /** Set the parent and child index values for all children */
-    public function freshenParentAndChildIndexes();
+    public function freshenAllParentAndChildIndexes();
 
     /** Add t as a child to this node.  If t is null, do nothing.  If t
      *  is nil, add all children of t to this' children.

@@ -53,7 +53,7 @@ interface TreeAdaptor
      *
      *  Override if you want another kind of node to be built.
      */
-    public function create(Token $payload);
+    public function create(Token $payload = null);
 
     /** Duplicate a single tree node.
      *  Override if you want another kind of node to be built.
@@ -63,9 +63,12 @@ interface TreeAdaptor
     /** Duplicate tree recursively, using dupNode() for each node */
     public function dupTree($tree);
 
-    /** Return a nil node (an empty but non-null node) that can hold
-     *  a list of element as the children.  If you want a flat tree (a list)
-     *  use "t=adaptor.nil(); t.addChild(x); t.addChild(y);"
+    /**
+     * Return a nil node (an empty but non-null node) that can hold
+     * a list of element as the children.  If you want a flat tree (a list)
+     * use "t=adaptor.nil(); t.addChild(x); t.addChild(y);"
+     *
+     * @return Tree
      */
     public function nil();
 
@@ -151,34 +154,13 @@ interface TreeAdaptor
 
     // R e w r i t e  R u l e s
 
-    /** Create a node for newRoot make it the root of oldRoot.
-     *  If oldRoot is a nil root, just copy or move the children to newRoot.
-     *  If not a nil root, make oldRoot a child of newRoot.
-     *
-     *  Return node created for newRoot.
-     *
-     *  Be advised: when debugging ASTs, the DebugTreeAdaptor manually
-     *  calls create(Token child) and then plain becomeRoot(node, node)
-     *  because it needs to trap calls to create, but it can't since it delegates
-     *  to not inherits from the TreeAdaptor.
-     */
-    public function becomeRoot(Token $newRoot, $oldRoot);
-
-    /** Create a new node derived from a token, with a new token type.
-     *  This is invoked from an imaginary node ref on right side of a
-     *  rewrite rule as IMAG[$tokenLabel].
-     *
-     *  This should invoke createToken(Token).
-     */
-    public function create($tokenType, Token $fromToken);
-
     /** Same as create(tokenType,fromToken) except set the text too.
      *  This is invoked from an imaginary node ref on right side of a
      *  rewrite rule as IMAG[$tokenLabel, "IMAG"].
      *
      *  This should invoke createToken(Token).
      */
-    public function create($tokenType, Token $fromToken, $text);
+    public function createFromAll(Token $fromToken, $tokenType = null, $tokenText = null);
 
     /** Create a new node derived from a token, with a new token type.
      *  This is invoked from an imaginary node ref on right side of a
@@ -186,8 +168,7 @@ interface TreeAdaptor
      *
      *  This should invoke createToken(int,String).
      */
-    public function create($tokenType, $text);
-
+    public function createFromType($tokenType, $text);
 
     // C o n t e n t
 

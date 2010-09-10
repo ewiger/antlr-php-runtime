@@ -32,10 +32,7 @@ namespace Antlr\Runtime\Tree;
 
 use Antlr\Runtime\Token;
 use Antlr\Runtime\TokenStream;
-
-// @todo
-#import org.antlr.runtime.misc.LookaheadStream;
-#import org.antlr.runtime.misc.IntArray;
+use Antlr\Runtime\Misc\LookaheadStream;
 
 class CommonTreeNodeStream extends LookaheadStream implements TreeNodeStream
 {
@@ -59,23 +56,18 @@ class CommonTreeNodeStream extends LookaheadStream implements TreeNodeStream
 
     public function __construct(Tree $tree, TreeAdaptor $adaptor = null)
     {
-
         if (!$adaptor) {
             $adaptor = new CommonTreeAdaptor();
         }
 
-        parent::__construct($adaptor->create(Token::EOF, "EOF"));
-
         $this->root = $tree;
         $this->adaptor = $adaptor;
-        $this->it = new TreeIterator($this->root);
-        // TODO: This cant be right!
-        $this->it->eof = $this->eof; // make sure tree iterator returns the EOF we want
+        $this->it = new TreeIterator($this->root, $this->adaptor);
     }
 
     public function reset()
     {
-        $this->reset();
+        parent::reset();
         $this->it->reset();
         $this->hasNilRoot = false;
         $this->level = 0;
@@ -93,24 +85,34 @@ class CommonTreeNodeStream extends LookaheadStream implements TreeNodeStream
         //System.out.println("pulled "+adaptor.getType(t));
         if ($t == $this->it->up) {
             $this->level--;
-            if ($this->level == 0 && $this->hasNilRoot)
+            if ($this->level == 0 && $this->hasNilRoot) {
                 return $this->it->next(); // don't give last UP; get EOF
-
-        }
-        else if ($t == $this->it->down)
+            }
+        } else if ($t == $this->it->down) {
             $this->level++;
+        }
         if ($this->level == 0 && $this->adaptor->isNil($t)) { // if nil root, scarf nil, DOWN
             $this->hasNilRoot = true;
             $t = $this->it->next(); // t is now DOWN, so get first real node next
             $this->level++;
             $t = $this->it->next();
         }
-        return Tt;
+        return $t;
+    }
+
+    public function isEOF($o)
+    {
+        return $this->adaptor->getType($o) == Token::EOF;
     }
 
     public function setUniqueNavigationNodes($uniqueNavigationNodes)
     {
 
+    }
+
+    public function get($i)
+    {
+        throw new \BadMethodCallException("Unsupported operation");
     }
 
     public function getTreeSource()
@@ -153,10 +155,7 @@ class CommonTreeNodeStream extends LookaheadStream implements TreeNodeStream
      */
     public function push($index)
     {
-        if ($this->calls == null) {
-            $this->calls = array();
-        }
-        $this->calls->push($this->p); // save current index
+        array_push($this->calls, $this->p); // save current index
         $this->seek($index);
     }
 
@@ -165,7 +164,7 @@ class CommonTreeNodeStream extends LookaheadStream implements TreeNodeStream
      */
     public function pop()
     {
-        $ret = $this->calls->pop();
+        $ret = array_pop($this->calls);
         $this->seek($ret);
         return $ret;
     }
@@ -179,7 +178,7 @@ class CommonTreeNodeStream extends LookaheadStream implements TreeNodeStream
         }
     }
 
-    public function toString($start, $stop)
+    public function toString($start = null, $stop = null)
     {
         // we'll have to walk from start to stop in tree; we're not keeping
         // a complete node stream buffer
@@ -199,7 +198,7 @@ class CommonTreeNodeStream extends LookaheadStream implements TreeNodeStream
             $o = $this->LT(1);
             $type = $this->adaptor->getType($o);
         }
-        return $buf;
+        return ltrim($buf);
     }
 
 }

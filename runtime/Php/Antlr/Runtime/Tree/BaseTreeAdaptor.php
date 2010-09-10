@@ -45,6 +45,9 @@ abstract class BaseTreeAdaptor implements TreeAdaptor
     protected $treeToUniqueIDMap;
     protected $uniqueNodeID = 1;
 
+    /**
+     * @return Tree
+     */
     public function nil()
     {
         return $this->create(null);
@@ -83,7 +86,9 @@ abstract class BaseTreeAdaptor implements TreeAdaptor
         $newTree = $this->dupNode($t);
         // ensure new subtree root has parent/child index set
         $this->setChildIndex($newTree, $this->getChildIndex($t)); // same index in new tree
-        $this->setParent($newTree, $parent);
+        if ($parent) {
+            $this->setParent($newTree, $parent);
+        }
         $n = $this->getChildCount($t);
         for ($i = 0; $i < $n; ++$i) {
             $child = $this->getChild($t, $i);
@@ -179,25 +184,20 @@ abstract class BaseTreeAdaptor implements TreeAdaptor
         return $r;
     }
 
-    public function create($tokenType, Token $fromToken)
+    public function createFromAll(Token $fromToken, $tokenType = null, $tokenText = null)
     {
-        $fromToken = $this->createToken($fromToken);
-        //((ClassicToken)fromToken).setType(tokenType);
-        $fromToken->setType($tokenType);
+        $fromToken = $this->createTokenFromToken($fromToken);
+        if ($tokenType) {
+            $fromToken->setType($tokenType);
+        }
+        if ($tokenText) {
+            $fromToken->setText($tokenText);
+        }
         $t = $this->create($fromToken);
         return $t;
     }
 
-    public function create($tokenType, Token $fromToken, $text)
-    {
-        $fromToken = $this->createToken($fromToken);
-        $fromToken->setType($tokenType);
-        $fromToken->setText($text);
-        $t = $this->create($fromToken);
-        return $t;
-    }
-
-    public function create($tokenType, $text)
+    public function createFromType($tokenType, $text)
     {
         $fromToken = $this->createToken($tokenType, $text);
         $t = $this->create($fromToken);
@@ -211,7 +211,7 @@ abstract class BaseTreeAdaptor implements TreeAdaptor
 
     public function setType($t, $type)
     {
-        throw new BadMethodCallException("don't know enough about Tree node");
+        throw new \BadMethodCallException("don't know enough about Tree node");
     }
 
     public function getText($t)
@@ -221,7 +221,7 @@ abstract class BaseTreeAdaptor implements TreeAdaptor
 
     public function setText($t, $text)
     {
-        throw new BadMethodCallException("don't know enough about Tree node");
+        throw new \BadMethodCallException("don't know enough about Tree node");
     }
 
     public function getChild($t, $i)
@@ -270,20 +270,6 @@ abstract class BaseTreeAdaptor implements TreeAdaptor
      */
     public abstract function createToken($tokenType, $text);
 
-    /** Tell me how to create a token for use with imaginary token nodes.
-     *  For example, there is probably no input symbol associated with imaginary
-     *  token DECL, but you need to create it as a payload or whatever for
-     *  the DECL node as in ^(DECL type ID).
-     *
-     *  This is a variant of createToken where the new token is derived from
-     *  an actual real input token.  Typically this is for converting '{'
-     *  tokens to BLOCK etc...  You'll see
-     *
-     *    r : lc='{' ID+ '}' -> ^(BLOCK[$lc] ID+) ;
-     *
-     *  If you care what the token payload objects' type is, you should
-     *  override this method and any other createToken variant.
-     */
-    public abstract function createToken(Token $fromToken);
+    public abstract function createTokenFromToken(Token $fromToken, $tokenType = null);
 }
 

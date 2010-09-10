@@ -31,6 +31,7 @@
 namespace Antlr\Runtime\Tree;
 
 use Antlr\Runtime\Token;
+use Antlr\Runtime\CommonToken;
 use Antlr\Runtime\TokenStream;
 
 /** A TreeAdaptor that works with any Tree implementation.  It provides
@@ -60,9 +61,9 @@ class CommonTreeAdaptor extends BaseTreeAdaptor
         return $t->dupNode();
     }
 
-    public function create($payload)
+    public function create(Token $payload = null)
     {
-        return new CommonTree($payload);
+        return new CommonTree(null, $payload);
     }
 
     /** Tell me how to create a token for use with imaginary token nodes.
@@ -77,7 +78,9 @@ class CommonTreeAdaptor extends BaseTreeAdaptor
      */
     public function createToken($tokenType, $text)
     {
-        return new CommonToken($tokenType, $text);
+        $token = new CommonToken(null, $tokenType, 0, 0, 0);
+        $token->setText($text);
+        return $token;
     }
 
     /** Tell me how to create a token for use with imaginary token nodes.
@@ -96,9 +99,13 @@ class CommonTreeAdaptor extends BaseTreeAdaptor
      *
      * @return CommonToken
      */
-    public function createToken($fromToken)
+    public function createTokenFromToken(Token $fromToken, $tokenType = null)
     {
-        return new CommonToken($fromToken);
+        $token = CommonToken::fromToken($fromToken);
+        if ($tokenType) {
+            $token->setType($tokenType);
+        }
+        return $token;
     }
 
     /** Track start/stop token for subtree root created for a rule.

@@ -53,9 +53,48 @@ interface WizardContextVisitor
     public function visit($t, $parent = null, $childIndex = null, $labels = null);
 }
 
+class TypeContextVisitor implements WizardContextVisitor
+{
+    private $nodes = array();
+
+    public function visit($t, $parent = null, $childIndex = null, $labels = null)
+    {
+        $this->nodes[] = $t;
+    }
+
+    public function getNodes()
+    {
+        return $this->nodes;
+    }
+}
+
+class PatternContextVisitor implements WizardContextVisitor
+{
+    /** @var TreeWizard */
+    protected $wizard;
+
+    protected $subtrees = array();
+
+    public function __construct($wizard)
+    {
+        $this->wizard = $wizard;
+    }
+
+    public function visit($t, $parent = null, $childIndex = null, $labels = null)
+    {
+        if ( $this->wizard->parse($t, $tpattern, null) ) {
+            $this->subtrees[] = $t;
+        }
+    }
+
+    public function getSubstrees()
+    {
+        return $this->subtrees;
+    }
+}
+
 class TreeWizard
 {
-
     protected $adaptor;
     protected $tokenNameToTypeMap;
 
@@ -126,7 +165,7 @@ class TreeWizard
     public function __construct(TreeAdaptor $adaptor, array $tokenNameToTypeMap = null)
     {
         $this->adaptor = $adaptor;
-        $this->tokenNameToTypeMap = $tokenNameToTypeMap;
+        $this->tokenNameToTypeMap = array_flip($tokenNameToTypeMap);
     }
 
     /** Using the map of token names to token types, return the type. */
@@ -153,7 +192,7 @@ class TreeWizard
     {
         $m = array();
         $this->_index($t, $m);
-        return m;
+        return $m;
     }
 
     /** Do the work for index */
@@ -163,31 +202,27 @@ class TreeWizard
             return;
         }
         $ttype = $this->adaptor->getType($t);
-        if (!isset($m[$ttype])) {
-            $m[$ttype] = array();
+        if (!isset($map[$ttype])) {
+            $map[$ttype] = array();
         }
-        $m[$ttype][] = $t;
+        $map[$ttype][] = $t;
         $n = $this->adaptor->getChildCount($t);
         for ($i = 0; $i < $n; ++$i) {
             $child = $this->adaptor->getChild($t, $i);
-            $this->_index($child, $m);
+            $this->_index($child, $map);
         }
     }
 
     /** Return a List of tree nodes with token type ttype */
-    public function find($t, $ttype)
+    public function findByTokenType($t, $ttype)
     {
-        $nodes = array();
-        /* @todo $this->visit($t, $ttype, new TreeWizard.Visitor() {
-          public void visit(Object t) {
-          nodes.add(t);
-          }
-          }); */
-        return $nodes;
+        $visitor = new TypeContextVisitor();
+        $this->visitByType($t, $ttype, $visitor);
+        return $visitor->getNodes();
     }
 
     /** Return a List of subtrees matching pattern. */
-    public function find($t, $pattern)
+    public function findByPattern($t, $pattern)
     {
         $subtrees = array();
         // Create a TreePattern from the pattern
@@ -199,22 +234,12 @@ class TreeWizard
             return null;
         }
         $rootTokenType = $tpattern->getType();
-        /* @todo $this->visit(t, rootTokenType, new TreeWizard.ContextVisitor() {
-          public void visit(Object t, Object parent, int childIndex, Map labels) {
-          if ( _parse(t, tpattern, null) ) {
-          subtrees.add(t);
-          }
-          }
-          }); */
-        return $subtrees;
+        $visitor = new PatternContextVisitor($this);
+        $this->visitByType($t, $rootTokenType, $visitor);
+        return $visitor->getSubstrees();
     }
 
     public function findFirst($t, $ttype)
-    {
-        return null;
-    }
-
-    public function findFirst($t, $pattern)
     {
         return null;
     }
@@ -224,7 +249,7 @@ class TreeWizard
      *  of the visitor action method is never set (it's null) since using
      *  a token type rather than a pattern doesn't let us set a label.
      */
-    public function visit($t, $ttype, WizardContextVisitor $visitor)
+    public function visitByType($t, $ttype, WizardContextVisitor $visitor)
     {
         $this->_visit($t, null, 0, $ttype, $visitor);
     }
@@ -250,7 +275,7 @@ class TreeWizard
      *  with visit(t, ttype, visitor) so nil-rooted patterns are not allowed.
      *  Patterns with wildcard roots are also not allowed.
      */
-    public function visit($t, $pattern, WizardContextVisitor $visitor)
+    public function visitByPattern($t, $pattern, WizardContextVisitor $visitor)
     {
         // Create a TreePattern from the pattern
         $tokenizer = new TreePatternLexer($pattern);
@@ -284,7 +309,7 @@ class TreeWizard
      *
      *  TODO: what's a better way to indicate bad pattern? Exceptions are a hassle
      */
-    public function parse($t, $pattern, $labels)
+    public function parse($t, $pattern, $labels = null)
     {
         $tokenizer = new TreePatternLexer($pattern);
         $parser = new TreePatternParser($tokenizer, $this, new TreePatternTreeAdaptor());
@@ -296,17 +321,12 @@ class TreeWizard
         return $this->_parse($t, $tpattern, $labels);
     }
 
-    public function parse($t, $pattern)
-    {
-        return $this->parse($t, $pattern, null);
-    }
-
     /** Do the work for parse. Check to see if the t2 pattern fits the
      *  structure and token types in t1.  Check text if the pattern has
      *  text arguments on nodes.  Fill labels map with pointers to nodes
      *  in tree matched against nodes in pattern with labels.
      */
-    public function parse($t1, $tpattern, $labels = null)
+    protected function _parse($t1, $tpattern, $labels = null)
     {
         // make sure both are non-null
         if ($t1 == null || $tpattern == null) {

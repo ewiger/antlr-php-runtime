@@ -39,7 +39,7 @@ class CommonToken extends Token
         return new CommonToken($input = null, $type);
     }
 
-    public function FromToken(Token $oldToken)
+    static public function fromToken(Token $oldToken)
     {
         $text = $oldToken->getText();
         $type = $oldToken->getType();

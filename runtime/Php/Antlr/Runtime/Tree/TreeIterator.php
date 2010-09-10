@@ -1,3 +1,4 @@
+<?php
 /*
 [The "BSD licence"]
 Copyright (c) 2005-2008 Terence Parr
@@ -25,107 +26,119 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.runtime.tree;
+namespace Antlr\Runtime\Tree;
 
-import org.antlr.runtime.Token;
-import org.antlr.runtime.misc.FastQueue;
-
-import java.util.Iterator;
+use Antlr\Runtime\Token;
+use Antlr\Runtime\Misc\FastQueue;
 
 /** Return a node stream from a doubly-linked tree whose nodes
  *  know what child index they are.  No remove() is supported.
  *
  *  Emit navigation nodes (DOWN, UP, and EOF) to let show tree structure.
  */
-public class TreeIterator implements Iterator {
-    protected TreeAdaptor adaptor;
-    protected Object root;
-    protected Object tree;
-    protected boolean firstTime = true;
+class TreeIterator
+{
+    protected $adaptor;
+    protected $root;
+    protected $tree;
+    protected $firstTime = true;
 
     // navigation nodes to return during walk and at end
-    public Object up;
-    public Object down;
-    public Object eof;
+    public $up;
+    public $down;
+    public $eof;
 
     /** If we emit UP/DOWN nodes, we need to spit out multiple nodes per
      *  next() call.
      */
-    protected FastQueue nodes;
+    protected $nodes;
 
-    public TreeIterator(Object tree) {
-        this(new CommonTreeAdaptor(),tree);
+    public function __construct(Tree $tree, TreeAdaptor $adaptor = null) {
+        if (!$adaptor) {
+            $adaptor = new CommonTreeAdaptor();
+        }
+
+        $this->adaptor = $adaptor;
+        $this->tree = $tree;
+        $this->root = $tree;
+        $this->nodes = new FastQueue();
+        $this->down = $this->adaptor->createFromType(Token::DOWN, "DOWN");
+        $this->up = $this->adaptor->createFromType(Token::UP, "UP");
+        $this->eof = $this->adaptor->createFromType(Token::EOF, "EOF");
     }
 
-    public TreeIterator(TreeAdaptor adaptor, Object tree) {
-        this.adaptor = adaptor;
-        this.tree = tree;
-        this.root = tree;
-        nodes = new FastQueue();
-        down = adaptor.create(Token.DOWN, "DOWN");
-        up = adaptor.create(Token.UP, "UP");
-        eof = adaptor.create(Token.EOF, "EOF");
+    public function reset() {
+        $this->firstTime = true;
+        $this->tree = $this->root;
+        $this->nodes->clear();
     }
 
-    public void reset() {
-        firstTime = true;
-        tree = root;
-        nodes.clear();
+    public function hasNext() {
+        if ( $this->firstTime ) {
+            return $this->root!=null;
+        }
+        if ( $this->nodes!=null && $this->nodes->size()>0 ) {
+            return true;
+        }
+        if ( $this->tree==null ) {
+            return false;
+        }
+        if ( $this->adaptor->getChildCount($this->tree)>0 ) {
+            return true;
+        }
+        return $this->adaptor->getParent($this->tree)!=null; // back at root?
     }
 
-    public boolean hasNext() {
-        if ( firstTime ) return root!=null;
-        if ( nodes!=null && nodes.size()>0 ) return true;
-        if ( tree==null ) return false;
-        if ( adaptor.getChildCount(tree)>0 ) return true;
-        return adaptor.getParent(tree)!=null; // back at root?
-    }
-
-    public Object next() {
-        if ( firstTime ) { // initial condition
-            firstTime = false;
-            if ( adaptor.getChildCount(tree)==0 ) { // single node tree (special)
-                nodes.add(eof);
-                return tree;
+    public function next() {
+        if ( $this->firstTime ) { // initial condition
+            $this->firstTime = false;
+            if ( $this->adaptor->getChildCount($this->tree)==0 ) { // single node tree (special)
+                $this->nodes->add($this->eof);
+                return $this->tree;
             }
-            return tree;
+            return $this->tree;
         }
         // if any queued up, use those first
-        if ( nodes!=null && nodes.size()>0 ) return nodes.remove();
+        if ( $this->nodes!=null && $this->nodes->size()>0 ) {
+            return $this->nodes->remove();
+        }
 
         // no nodes left?
-        if ( tree==null ) return eof;
+        if ( $this->tree==null ) {
+            return $this->eof;
+        }
 
         // next node will be child 0 if any children
-        if ( adaptor.getChildCount(tree)>0 ) {
-            tree = adaptor.getChild(tree, 0);
-            nodes.add(tree); // real node is next after DOWN
-            return down;
+        if ( $this->adaptor->getChildCount($this->tree)>0 ) {
+            $this->tree = $this->adaptor->getChild($this->tree, 0);
+            $this->nodes->add($this->tree); // real node is next after DOWN
+            return $this->down;
         }
         // if no children, look for next sibling of tree or ancestor
-        Object parent = adaptor.getParent(tree);
+        $parent = $this->adaptor->getParent($this->tree);
         // while we're out of siblings, keep popping back up towards root
-        while ( parent!=null &&
-                adaptor.getChildIndex(tree)+1 >= adaptor.getChildCount(parent) )
-        {
-            nodes.add(up); // we're moving back up
-            tree = parent;
-            parent = adaptor.getParent(tree);
+        while ( $parent!=null && $this->adaptor->getChildIndex($this->tree)+1 >= $this->adaptor->getChildCount($parent) ) {
+            $this->nodes->add($this->up); // we're moving back up
+            $this->tree = $parent;
+            $parent = $this->adaptor->getParent($this->tree);
         }
         // no nodes left?
-        if ( parent==null ) {
-            tree = null; // back at root? nothing left then
-            nodes.add(eof); // add to queue, might have UP nodes in there
-            return nodes.remove();
+        if ( $parent==null ) {
+            $this->tree = null; // back at root? nothing left then
+            $this->nodes->add($this->eof); // add to queue, might have UP nodes in there
+            return $this->nodes->remove();
         }
 
         // must have found a node with an unvisited sibling
         // move to it and return it
-        int nextSiblingIndex = adaptor.getChildIndex(tree) + 1;
-        tree = adaptor.getChild(parent, nextSiblingIndex);
-        nodes.add(tree); // add to queue, might have UP nodes in there
-        return nodes.remove();
+        $nextSiblingIndex = $this->adaptor->getChildIndex($this->tree) + 1;
+        $this->tree = $this->adaptor->getChild($parent, $nextSiblingIndex);
+        $this->nodes->add($this->tree); // add to queue, might have UP nodes in there
+        return $this->nodes->remove();
     }
 
-    public void remove() { throw new UnsupportedOperationException(); }
+    public function remove()
+    {
+        throw new \BadMethodCallException();
+    }
 }

@@ -54,11 +54,11 @@ class TreePatternParser
 
     public function pattern()
     {
-        if ($ttype == TreePatternLexer::BEGIN) {
+        if ($this->ttype == TreePatternLexer::BEGIN) {
             return $this->parseTree();
-        } else if ($ttype == TreePatternLexer::ID) {
+        } else if ($this->ttype == TreePatternLexer::ID) {
             $node = $this->parseNode();
-            if ($ttype == TreePatternLexer::EOF) {
+            if ($this->ttype == TreePatternLexer::EOF) {
                 return $node;
             }
             return null; // extra junk on end
@@ -136,7 +136,7 @@ class TreePatternParser
         }
         $tokenName = $this->tokenizer->sval;
         $this->ttype = $this->tokenizer->nextToken();
-        if ($tokenName->equals("nil")) {
+        if ($tokenName == "nil") {
             return $this->adaptor->nil();
         }
         $text = $tokenName;
@@ -153,7 +153,7 @@ class TreePatternParser
         if ($treeNodeType == Token::INVALID_TOKEN_TYPE) {
             return null;
         }
-        $node = $this->adaptor->create($treeNodeType, $text);
+        $node = $this->adaptor->createFromType($treeNodeType, $text);
         if ($label != null && get_class($node) == "Antlr\Runtime\Tree\TreePattern") {
             $node->label = $label;
         }

@@ -63,7 +63,6 @@ class CommonTree extends BaseTree
 
     public function __construct(CommonTree $node = null, Token $token = null)
     {
-        parent::__construct($node);
         if ($node) {
             $this->token = $node->token;
             $this->startIndex = $node->startIndex;
@@ -188,7 +187,7 @@ class CommonTree extends BaseTree
         return $this->parent;
     }
 
-    public function setParent(CommonTree $t)
+    public function setParent(Tree $t)
     {
         $this->parent = $t;
     }

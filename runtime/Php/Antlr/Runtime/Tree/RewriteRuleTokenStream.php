@@ -54,7 +54,7 @@ class RewriteRuleTokenStream extends RewriteRuleElementStream
 
     protected function dup($el)
     {
-        throw new BadMethodCallException("dup can't be called for a token stream.");
+        throw new \BadMethodCallException("dup can't be called for a token stream.");
     }
 
 }
