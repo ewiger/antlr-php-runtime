@@ -4,9 +4,9 @@ SET CLASSPATH=%CLASSPATH%;.\lib\antlr-3.1.3-php.jar;.\lib\antlr-2.7.7.jar;.\lib\
 rem java org.antlr.Tool
 rem goto skip
 
-for %%i in (test\grammers\*.g) DO (
+for %%i in (runtime\Php\test\Antlr\Tests\grammers\*.g) DO (
 	ECHO [generating %%i]
-	java org.antlr.Tool -make -fo test\generated %%i
+	java org.antlr.Tool -make -fo runtime\Php\test\Antlr\Tests\generated %%i
 )
 
 :skip

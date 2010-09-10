@@ -2,4 +2,6 @@
 
 export PROJ_PATH=`pwd`
 
-phpunit --bootstrap test/bootstrap.php --include-path="${PROJ_PATH}:${PROJ_PATH}/runtime/Php/" test/$1
+cd runtime/Php/test
+
+phpunit --bootstrap bootstrap.php Antlr/Tests/$1

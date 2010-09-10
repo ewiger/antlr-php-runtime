@@ -1,4 +1,5 @@
 #!/bin/bash
+# Call by: "./runtests.sh"
 
 file=test
 if [[ $1 ]]; then
@@ -6,5 +7,6 @@ if [[ $1 ]]; then
 fi
 
 export PROJ_PATH=`pwd`
+cd runtime/Php/test
 
-phpunit "$2" --bootstrap test/bootstrap.php --include-path="${PROJ_PATH}:${PROJ_PATH}/runtime/Php/" ${file}
+phpunit "$2" --bootstrap bootstrap.php Antlr/Tests

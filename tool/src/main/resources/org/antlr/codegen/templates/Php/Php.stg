@@ -82,8 +82,8 @@ use Antlr\Runtime\UnwantedtokenException;
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
       filterMode, superClass="Lexer") ::= <<
- 
-<cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>     
+
+<cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>
 
 class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
     <tokens:{const T_<it.name>=<it.type>;}; separator="\n">
@@ -103,7 +103,7 @@ class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
 <if(memoize)>
 <if(grammar.grammarIsRoot)>
         $this->state->ruleMemo = array();<\n> <! index from 1..n !>
-		
+
 <endif>
 <endif>
         <grammar.directDelegates:
@@ -111,7 +111,7 @@ class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
         <grammar.delegators:
          {g|$this-><g:delegateName()> = $this-><g:delegateName()>;}; separator="\n">
         <last(grammar.delegators):{g|$this->gParent = $this-><g:delegateName()>;}>
-        
+
         <actions.lexer.init>
             <cyclicDFAs:{dfa | $this->dfa<dfa.decisionNumber> = new <grammar.recognizerName>_DFA<dfa.decisionNumber>($this);}; separator="\n">
     }
@@ -216,11 +216,11 @@ class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
     <last(grammar.delegators):{g|public $gParent;}>
 
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
-    
+
     <bitsets:{static public $FOLLOW_<it.name>_in_<it.inName><it.tokenIndex> = array(<it.tokenTypes:{<it> => <it>};separator=", ">);<\n>}>
-    
+
     <cyclicDFAs:{dfa | protected $dfa<dfa.decisionNumber>;}; separator="\n">
-    
+
     <@members>
     <! WARNING. bug in ST: this is cut-n-paste into Dbg.stg !>
     public function __construct($input, $state<grammar.delegators:{g|, $<g:delegateName()>}> = null) {
@@ -230,10 +230,10 @@ class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
         parent::__construct($input, $state<grammar.delegators:{g|, $<g:delegateName()>}>);
         <parserCtorBody()>
         <grammar.directDelegates:
-         {g|$this-><g:delegateName()> = new <g.recognizerName>($input, $state<trunc(g.delegators):{p|, $<p:delegateName()>}>, $this);}; separator="\n">         
+         {g|$this-><g:delegateName()> = new <g.recognizerName>($input, $state<trunc(g.delegators):{p|, $<p:delegateName()>}>, $this);}; separator="\n">
         <grammar.indirectDelegates:{g | $this-><g:delegateName()> = $this-><g.delegator:delegateName()>-><g:delegateName()>;}; separator="\n">
         <last(grammar.delegators):{g|$this->gParent = $this-><g:delegateName()>;}>
-        
+
         <cyclicDFAs:{dfa | $this->dfa<dfa.decisionNumber> = new <grammar.recognizerName>_DFA<dfa.decisionNumber>($this);}; separator="\n">
     }
     <@end>
@@ -253,7 +253,7 @@ class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
 
     <synpreds:{p | <synpred(p)>}>
 
-    
+
 }
 
 <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>
@@ -263,8 +263,8 @@ parserCtorBody() ::= <<
 <if(memoize)>
 <if(grammar.grammarIsRoot)>
 $this->state->ruleMemo = array();<\n> <! index from 1..n !>
-for ($i=0; $i \< <numRules>; $i++) { 
-    $this->state->ruleMemo[$i] = array();				
+for ($i=0; $i \< <numRules>; $i++) {
+    $this->state->ruleMemo[$i] = array();
 }
 <endif>
 <endif>
@@ -279,10 +279,10 @@ parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTL
 /** How to generate a tree parser; same as parser except the input
  *  stream is a different type.
  */
-treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, 
-           numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", 
-           superClass="TreeParser", 
-           members={<actions.treeparser.members>}) ::= <<
+treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules,
+           numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object",
+           superClass="TreeParser",
+           members={<actions.treeparser.members>}, filterMode) ::= <<
 <genericParser(inputStreamType="TreeNodeStream", rewriteElementType="Node", ...)>
 >>
 
@@ -296,7 +296,7 @@ treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules,
 synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
 // $ANTLR start <ruleName>
-public function <ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) {   
+public function <ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) {
 <if(trace)>
     traceIn("<ruleName>_fragment", <ruleDescriptor.index>);
     try {
@@ -399,7 +399,7 @@ public function <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=i
     <memoize()>
     <ruleScopeCleanUp()>
     <finally>
-    
+
     <@postamble()>
     return <ruleReturnValue()>;
 }
@@ -1068,7 +1068,7 @@ class <grammar.recognizerName>_DFA<dfa.decisionNumber> extends DFA {
         $nvae =
             new NoViableAltException($this->getDescription(), <dfa.decisionNumber>, $_s, $input);
         $this->error($nvae);
-        throw $nvae;        
+        throw $nvae;
     }<\n>
 <endif>
 }<\n>
@@ -1315,7 +1315,7 @@ lexerRuleLabelPropertyRef_type(scope,attr) ::=
     "($<scope>!=null?$<scope>->getType():0)"
 lexerRuleLabelPropertyRef_line(scope,attr) ::=
     "($<scope>!=null?$<scope>->getLine():0)"
-lexerRuleLabelPropertyRef_pos(scope,attr) ::= 
+lexerRuleLabelPropertyRef_pos(scope,attr) ::=
     "($<scope>!=null?$<scope>->getCharPositionInLine():-1)"
 lexerRuleLabelPropertyRef_channel(scope,attr) ::=
     "($<scope>!=null?$<scope>->getChannel():0)"
