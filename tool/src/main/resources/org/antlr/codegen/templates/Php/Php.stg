@@ -798,7 +798,7 @@ wildcardCharListLabel(label, elementIndex) ::= <<
  */
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
 $this->pushFollow(self::$FOLLOW_<rule.name>_in_<ruleName><elementIndex>);
-<if(label)>$<label> = <endif>$this-><if(scope)><scope:delegateName()>-><endif><rule.name>(<args; separator=", ">);<\n>
+<if(label)>$<label> = <endif>$this-><if(scope)><scope:delegateName()>-><endif><rule.name>(<args:{a|$<a>}; separator=", ">);<\n>
 $this->state->_fsp--;
 <checkRuleBacktrackFailure()>
 >>
@@ -818,10 +818,10 @@ ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 lexerRuleRef(rule,label,args,elementIndex,scope) ::= <<
 <if(label)>
 $<label>Start<elementIndex> = $this->getCharIndex();
-$this-><if(scope)><scope:delegateName()>-><endif>m<rule.name>(<args; separator=", ">); <checkRuleBacktrackFailure()>
+$this-><if(scope)><scope:delegateName()>-><endif>m<rule.name>(<args:{a|$<a>}; separator=", ">); <checkRuleBacktrackFailure()>
 $<label> = new CommonToken($this->input, Token::INVALID_TOKEN_TYPE, Token::DEFAULT_CHANNEL, $<label>Start<elementIndex>, $this->getCharIndex()-1);
 <else>
-$this-><if(scope)><scope:delegateName()>-><endif>m<rule.name>(<args; separator=", ">); <checkRuleBacktrackFailure()>
+$this-><if(scope)><scope:delegateName()>-><endif>m<rule.name>(<args:{a|$<a>}; separator=", ">); <checkRuleBacktrackFailure()>
 <endif>
 >>
 
