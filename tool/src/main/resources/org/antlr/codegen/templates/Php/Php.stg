@@ -1214,7 +1214,11 @@ public static function <ruleDescriptor:returnStructName()>() {
 >>
 
 parameterScope(scope) ::= <<
-<scope.attributes:{$<it.decl>}; separator=", ">
+<scope.attributes:parameterScopeAttribute(attr=it); separator=", ">
+>>
+
+parameterScopeAttribute(attr) ::= <<
+<if(attr.type)><it.type> $<it.name><else>$<it.name><endif>
 >>
 
 parameterAttributeRef(attr) ::= "<attr.name>"
