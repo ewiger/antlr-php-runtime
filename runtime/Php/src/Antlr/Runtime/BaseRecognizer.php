@@ -338,7 +338,7 @@ abstract class BaseRecognizer
      */
     public function beginResync()
     {
-        
+
     }
 
     public function endResync()

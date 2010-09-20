@@ -41,9 +41,9 @@ abstract class Parser extends BaseRecognizer
      */
     public $input;
 
-    public function __construct($input, $state = null)
+    public function __construct(TokenStream $input, $state = null)
     {
-        parent::__construct($state); // share the state object with another parser
+        parent::__construct($state); // share the state object with another parser        
         $this->setTokenStream($input);
     }
 
@@ -56,8 +56,8 @@ abstract class Parser extends BaseRecognizer
     }
 
     protected function getCurrentInputSymbol($input)
-    {
-        return $this->input->LT(1);
+    {        
+        return $input->LT(1);
     }
 
     protected function getMissingSymbol($input, $e, $expectedTokenType, $follow)
@@ -72,7 +72,7 @@ abstract class Parser extends BaseRecognizer
         $t = new CommonToken($expectedTokenType, $tokenText);
         $current = $input->LT(1);
         if ($current->getType() === Token::EOF) {
-            $current = $this->input->LT(-1);
+            $current = $input->LT(-1);
 
             if (!$current) {
                 throw new \Exception("No previous token found!");
